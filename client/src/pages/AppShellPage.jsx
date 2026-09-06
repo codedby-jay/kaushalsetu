@@ -23,8 +23,8 @@ export function AppShellPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-secondary">
-          Signed in as {user?.name} · {roleLabel}. Students can browse published
-          listings and see an explainable skill match. Applications remain a later phase.
+          Signed in as {user?.name} · {roleLabel}. Students can set a career goal,
+          take recommended assessments, and see explainable opportunity matches.
         </p>
         <div className="mt-6 rounded-md border border-border bg-surface">
           <EmptyState

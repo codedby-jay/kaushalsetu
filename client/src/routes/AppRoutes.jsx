@@ -11,6 +11,7 @@ import { AssessmentResultPage } from "../pages/student/AssessmentResultPage.jsx"
 import { SkillIntelligencePage } from "../pages/student/SkillIntelligencePage.jsx";
 import { StudentProfilePage } from "../pages/student/StudentProfilePage.jsx";
 import { StudentSkillsPage } from "../pages/student/StudentSkillsPage.jsx";
+import { CareerRoadmapPage } from "../pages/student/CareerRoadmapPage.jsx";
 
 import { StudentOpportunitiesPage } from "../pages/student/StudentOpportunitiesPage.jsx";
 import { CompanyProfilePage } from "../pages/industry/CompanyProfilePage.jsx";
@@ -69,6 +70,14 @@ export function AppRoutes() {
         element={
           <StudentRoute>
             <StudentSkillsPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/career-roadmap"
+        element={
+          <StudentRoute>
+            <CareerRoadmapPage />
           </StudentRoute>
         }
       />
