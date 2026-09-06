@@ -1,30 +1,70 @@
 import {
   Briefcase,
+  Building2,
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
+  LineChart,
   Sparkles,
-  UserRound,
+  Users,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { cn } from "../../utils/cn.js";
 
-const items = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-  { id: "opportunities", label: "Opportunities", icon: Briefcase, available: false },
-  { id: "applications", label: "Applications", icon: ClipboardList, available: false },
-  { id: "skills", label: "Skills", icon: Sparkles, available: false },
-  { id: "learning", label: "Learning", icon: GraduationCap, available: false },
-  { id: "portfolio", label: "Portfolio", icon: UserRound, available: false },
-];
+const ROLE_LABELS = {
+  STUDENT: "Student",
+  INDUSTRY: "Industry",
+  ACADEMICIAN: "Academician",
+  INSTITUTION: "Institution",
+  ADMIN: "Admin",
+};
+
+const NAV_BY_ROLE = {
+  STUDENT: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
+    { id: "skills", label: "My Skills", icon: Sparkles, available: false },
+    { id: "opportunities", label: "Opportunities", icon: Briefcase, available: false },
+    { id: "applications", label: "Applications", icon: ClipboardList, available: false },
+  ],
+  INDUSTRY: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
+    { id: "opportunities", label: "Opportunities", icon: Briefcase, available: false },
+    { id: "candidates", label: "Candidates", icon: Users, available: false },
+  ],
+  ACADEMICIAN: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
+    { id: "faculty", label: "Faculty Opportunities", icon: Briefcase, available: false },
+    { id: "research", label: "Research", icon: GraduationCap, available: false },
+    { id: "consultancy", label: "Consultancy", icon: Building2, available: false },
+  ],
+  INSTITUTION: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
+    { id: "students", label: "Students", icon: Users, available: false },
+    { id: "analytics", label: "Analytics", icon: LineChart, available: false },
+  ],
+  ADMIN: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
+    { id: "users", label: "Users", icon: Users, available: false },
+    { id: "analytics", label: "Analytics", icon: LineChart, available: false },
+  ],
+};
 
 export function Sidebar() {
+  const { user } = useAuth();
+  const items = NAV_BY_ROLE[user?.role] || NAV_BY_ROLE.STUDENT;
+
   return (
     <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-surface">
       <div className="border-b border-border px-4 py-3">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-secondary">
           Workspace
         </p>
-        <p className="mt-0.5 text-sm font-medium text-text">Student view</p>
+        <p className="mt-0.5 text-sm font-medium text-text">
+          {user?.name || "Account"}
+        </p>
+        <p className="text-xs text-secondary">
+          {ROLE_LABELS[user?.role] || user?.role}
+        </p>
       </div>
       <nav className="flex flex-col gap-0.5 p-3" aria-label="Application">
         {items.map((item) => {
@@ -53,7 +93,7 @@ export function Sidebar() {
         })}
       </nav>
       <p className="mt-auto px-4 pb-4 text-[11px] leading-relaxed text-secondary">
-        Navigation items besides Dashboard are placeholders until later phases.
+        Navigation besides Dashboard is a placeholder until later phases.
       </p>
     </aside>
   );

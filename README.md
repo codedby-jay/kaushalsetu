@@ -25,24 +25,25 @@ For each required skill:
 
 The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented in Phase 1**.
 
-## Current status (Phase 1)
+## Current status (Phase 2)
 
-Phase 1 is the **foundation only**:
+Completed:
 
-- Project structure (`client/` + `server/`)
-- Express API with `GET /api/health`
-- Prisma + PostgreSQL configuration and `User` model
-- React + Vite + Tailwind design system
-- Landing page, login **placeholder**, application **shell**
+- Project structure, design system, landing page, and application shell (Phase 1)
+- User registration and login
+- Password hashing with bcryptjs
+- JWT access tokens and authentication middleware
+- Role-based authorization middleware
+- Protected `/app` shell that shows the signed-in name and role
 
-Not yet implemented: authentication, skill assessment, matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: student profiles, skill assessment, matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
 | Module | Phase |
 | --- | --- |
-| Foundation + UI design system | 1 (this release) |
-| Authentication + RBAC | 2 |
+| Foundation + UI design system | 1 |
+| Authentication + RBAC | 2 (this release) |
 | Student profile + skills | 3 |
 | Skill assessment + skill intelligence | 4 |
 | Industry opportunities | 5 |
@@ -63,10 +64,10 @@ Not yet implemented: authentication, skill assessment, matching, opportunities, 
 | --- | --- |
 | Frontend | React, JavaScript, Vite, React Router, Tailwind CSS, Axios, Lucide React |
 | Backend | Node.js, Express.js, JavaScript, REST |
-| Database | PostgreSQL, Prisma ORM 6.x |
+| Database | PostgreSQL, Prisma ORM 6.19.3 |
+| Auth | JWT (`jsonwebtoken`), bcryptjs |
 
-Prisma is pinned to **6.x**. Prisma 7+ moved the database URL into a separate config file and requires a driver adapter (`pg` + `@prisma/adapter-pg`). Phase 1 keeps the documented `schema.prisma` + `DATABASE_URL` setup so the stack stays JavaScript-only and beginner-friendly.
-| Auth (later) | JWT, bcrypt |
+Prisma is pinned to **6.19.3**. Prisma 7+ moved the database URL into a separate config file and requires a driver adapter. This project keeps `schema.prisma` + `DATABASE_URL`.
 
 JavaScript only. No TypeScript, MongoDB, Mongoose, NestJS, or microservices for this MVP.
 
@@ -129,7 +130,7 @@ Copy `.env.example` to `server/.env` and replace placeholders:
 cp .env.example server/.env
 ```
 
-Do not commit `.env`. `JWT_SECRET` is reserved for Phase 2 and is unused in Phase 1.
+Do not commit `.env`. Set a long random `JWT_SECRET` before using login. Public registration cannot create `ADMIN` accounts.
 
 Optional frontend override (`client/.env`):
 
@@ -147,15 +148,32 @@ Phase 1 **does not require** PostgreSQL for the API process to start. If the dat
 
 ### 5. Prisma (requires a running PostgreSQL instance)
 
-These commands fail if PostgreSQL is not running or `DATABASE_URL` is wrong. That is expected.
+The repository includes a committed migration history:
+
+1. `init_user_foundation` — Phase 1 schema
+2. `add_authentication` — `User.name` and default role `STUDENT`
+
+If you already created a local `kaushalsetu` database during Phase 1 (no git migration history), treat it as disposable and recreate it:
 
 ```bash
+dropdb kaushalsetu
+createdb kaushalsetu
 cd server
 npx prisma validate
-npx prisma migrate dev --name init_user_foundation
+npx prisma migrate dev
+npx prisma generate
 ```
 
-`npx prisma generate` does **not** require a live database.
+On Linux/macOS with `psql` instead of `dropdb`/`createdb`:
+
+```bash
+psql -d postgres -c "DROP DATABASE IF EXISTS kaushalsetu;"
+psql -d postgres -c "CREATE DATABASE kaushalsetu;"
+```
+
+Do **not** use `prisma db push`. Fresh clones should use `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (apply existing migrations only).
+
+`npx prisma generate` does **not** require a live database, but it does need `DATABASE_URL` to be set.
 
 ### 6. Start the backend
 
@@ -181,9 +199,14 @@ App: `http://localhost:5173`
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/api/health` | Service + database status |
+| POST | `/api/auth/register` | Public registration (no ADMIN) |
+| POST | `/api/auth/login` | Returns JWT + user |
+| GET | `/api/auth/me` | Current user (Bearer token) |
+| GET | `/api/auth/student-only` | RBAC demo: STUDENT 200, others 403 |
 | UI | `/` | Landing page |
-| UI | `/login` | Login placeholder (no auth) |
-| UI | `/app` | Application shell |
+| UI | `/register` | Registration |
+| UI | `/login` | Sign in |
+| UI | `/app` | Protected application shell |
 
 ## Development phases
 

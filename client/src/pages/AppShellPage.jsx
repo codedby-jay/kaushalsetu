@@ -1,8 +1,20 @@
 import { Layers } from "lucide-react";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import { AppLayout } from "../layouts/AppLayout.jsx";
 
+const ROLE_LABELS = {
+  STUDENT: "Student",
+  INDUSTRY: "Industry",
+  ACADEMICIAN: "Academician",
+  INSTITUTION: "Institution",
+  ADMIN: "Admin",
+};
+
 export function AppShellPage() {
+  const { user } = useAuth();
+  const roleLabel = ROLE_LABELS[user?.role] || user?.role;
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl">
@@ -11,8 +23,8 @@ export function AppShellPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-secondary">
-          This is the application shell. Role-specific modules will be introduced
-          in later phases.
+          Signed in as {user?.name} · {roleLabel}. Role-specific modules will be
+          introduced in later phases.
         </p>
         <div className="mt-6 rounded-md border border-border bg-surface">
           <EmptyState
