@@ -16,16 +16,16 @@ KaushalSetu is a central portal that connects **students**, **industries**, **ac
 
 The MVP matching engine is an **explainable mathematical model**, not an LLM or embedding search.
 
-For each required skill:
+For each opportunity skill, student proficiency **S** is compared with required proficiency **R**. Required skills use weight **1.0**; optional skills use **0.5**.
 
-- If student proficiency ≥ required proficiency → full points
-- Otherwise → partial points = student proficiency / required proficiency
+- If **R = 0**, the skill is fully satisfied (`scoreRatio = 1`)
+- Otherwise `scoreRatio = min(S / R, 1)` (missing student records use **S = 0**)
 
-`matchPercentage = (earned points / total possible points) × 100`
+`matchPercentage = round( sum(scoreRatio × weight) / sum(weights) × 100 )`
 
-The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented yet**.
+The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
 
-## Current status (Phase 5)
+## Current status (Phase 6)
 
 Completed:
 
@@ -34,8 +34,9 @@ Completed:
 - Student profile and skills (Phase 3)
 - Skill assessments, scoring, Skill Intelligence, industry readiness (Phase 4)
 - Industry company profiles, opportunities, skill requirements, student browse/filter (Phase 5)
+- Explainable skill matching (student → published opportunity) (Phase 6)
 
-Not yet implemented: matching, applications, ranking, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: applications, ranking, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
@@ -45,8 +46,8 @@ Not yet implemented: matching, applications, ranking, analytics, academician por
 | Authentication + RBAC | 2 |
 | Student profile + skills | 3 |
 | Skill assessment + skill intelligence | 4 |
-| Industry opportunities | 5 (this release) |
-| Matching engine | 6 |
+| Industry opportunities | 5 |
+| Matching engine | 6 (this release) |
 | Applications + tracking | 7 |
 | Industry candidate ranking | 8 |
 | Institution analytics | 9 |

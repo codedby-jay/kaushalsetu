@@ -192,3 +192,8 @@ export async function getPublishedOpportunity(id) {
   const response = await api.get(`/opportunities/${id}`);
   return response.data;
 }
+
+export async function getOpportunityMatch(id) {
+  const response = await api.get(`/opportunities/${id}/match`);
+  return response.data;
+}
