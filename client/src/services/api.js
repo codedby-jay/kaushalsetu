@@ -8,7 +8,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 8000,
+  timeout: 15000,
 });
 
 api.interceptors.request.use((config) => {
@@ -85,5 +85,40 @@ export async function updateStudentSkill(skillId, data) {
 
 export async function removeStudentSkill(skillId) {
   const response = await api.delete(`/student/skills/${skillId}`);
+  return response.data;
+}
+
+export async function getAssessments() {
+  const response = await api.get("/assessments");
+  return response.data;
+}
+
+export async function getAssessment(id) {
+  const response = await api.get(`/assessments/${id}`);
+  return response.data;
+}
+
+export async function startAssessment(id) {
+  const response = await api.post(`/assessments/${id}/start`);
+  return response.data;
+}
+
+export async function submitAssessment(id, payload) {
+  const response = await api.post(`/assessments/${id}/submit`, payload);
+  return response.data;
+}
+
+export async function getAssessmentHistory() {
+  const response = await api.get("/student/assessments/history");
+  return response.data;
+}
+
+export async function getAssessmentResult(attemptId) {
+  const response = await api.get(`/student/assessment-results/${attemptId}`);
+  return response.data;
+}
+
+export async function getSkillIntelligence() {
+  const response = await api.get("/student/skill-intelligence");
   return response.data;
 }

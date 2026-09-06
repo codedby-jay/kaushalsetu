@@ -23,14 +23,14 @@ export function AppShellPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-secondary">
-          Signed in as {user?.name} · {roleLabel}. Use My Profile and My Skills to
-          complete your student record. Other modules arrive in later phases.
+          Signed in as {user?.name} · {roleLabel}. Complete an assessment to refresh
+          Skill Intelligence. Opportunities remain a later phase.
         </p>
         <div className="mt-6 rounded-md border border-border bg-surface">
           <EmptyState
             icon={Layers}
             title="Modules arrive in later phases"
-            description="Student profiles, skill assessment, opportunity matching, applications, and institution analytics will be built phase by phase. The navigation on the left is a structural placeholder and is not connected to those features yet."
+            description="Opportunity matching, applications, and institution analytics will be built in later phases. Skill assessment and Skill Intelligence are available in the sidebar."
           />
         </div>
       </div>

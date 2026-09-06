@@ -1,6 +1,7 @@
 import {
   Briefcase,
   Building2,
+  ClipboardCheck,
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
@@ -26,6 +27,8 @@ const NAV_BY_ROLE = {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
     { id: "profile", label: "My Profile", icon: UserRound, to: "/app/profile" },
     { id: "skills", label: "My Skills", icon: Sparkles, to: "/app/skills" },
+    { id: "assessments", label: "Skill Assessment", icon: ClipboardCheck, to: "/app/assessments" },
+    { id: "intelligence", label: "Skill Intelligence", icon: LineChart, to: "/app/skill-intelligence" },
     { id: "opportunities", label: "Opportunities", icon: Briefcase },
     { id: "applications", label: "Applications", icon: ClipboardList },
   ],
