@@ -1,8 +1,25 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { cn } from "../../utils/cn.js";
+import { Button } from "../ui/Button.jsx";
+
+const ROLE_LABELS = {
+  STUDENT: "Student",
+  INDUSTRY: "Industry",
+  ACADEMICIAN: "Academician",
+  INSTITUTION: "Institution",
+  ADMIN: "Admin",
+};
 
 export function Navbar({ variant = "public" }) {
   const isApp = variant === "app";
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface">
@@ -28,12 +45,17 @@ export function Navbar({ variant = "public" }) {
 
         {isApp ? (
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-secondary sm:inline">
-              Signed in as guest
-            </span>
-            <span className="rounded-sm border border-border px-2 py-1 text-xs font-medium text-secondary">
-              Phase 1
-            </span>
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-medium leading-tight text-text">
+                {user?.name || "Signed in"}
+              </p>
+              <p className="text-[11px] text-secondary">
+                {ROLE_LABELS[user?.role] || user?.role}
+              </p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              Log out
+            </Button>
           </div>
         ) : (
           <nav className="flex items-center gap-2">
@@ -44,7 +66,7 @@ export function Navbar({ variant = "public" }) {
               Sign in
             </NavLink>
             <NavLink
-              to="/login"
+              to="/register"
               className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-hover"
             >
               Get Started

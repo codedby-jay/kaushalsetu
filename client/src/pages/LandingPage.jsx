@@ -88,12 +88,12 @@ export function LandingPage() {
             and jobs using an explainable compatibility score — not a black box.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/login">
+            <Link to="/register">
               <Button size="lg">Get Started</Button>
             </Link>
-            <Link to="/app">
+            <Link to="/login">
               <Button size="lg" variant="secondary">
-                View application shell
+                Sign in
               </Button>
             </Link>
           </div>
