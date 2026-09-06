@@ -1,5 +1,7 @@
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { ASSESSMENTS } from "./assessmentSeedData.js";
+import { DEMO_INDUSTRY_PASSWORD, INDUSTRY_SEEDS } from "./opportunitySeedData.js";
 
 const prisma = new PrismaClient();
 
@@ -23,6 +25,7 @@ const SKILLS = [
   { name: "Algorithms", category: "TECHNICAL" },
   { name: "DSA", category: "TECHNICAL" },
   { name: "Docker", category: "TECHNICAL" },
+  { name: "Linux", category: "TECHNICAL" },
   { name: "Communication", category: "SOFT" },
   { name: "Leadership", category: "SOFT" },
   { name: "Teamwork", category: "SOFT" },
@@ -88,10 +91,110 @@ async function seedAssessments() {
   }
 }
 
+function deadlineFrom(value) {
+  if (!value) {
+    return null;
+  }
+  return new Date(`${value}T00:00:00.000Z`);
+}
+
+async function seedIndustryOpportunities() {
+  const skills = await prisma.skill.findMany();
+  const skillByName = new Map(skills.map((item) => [item.name, item]));
+  const passwordHash = await bcrypt.hash(DEMO_INDUSTRY_PASSWORD, 10);
+
+  for (const entry of INDUSTRY_SEEDS) {
+    let user = await prisma.user.findUnique({
+      where: { email: entry.email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: entry.name,
+          email: entry.email,
+          passwordHash,
+          role: "INDUSTRY",
+        },
+      });
+    }
+
+    const company = await prisma.companyProfile.upsert({
+      where: { userId: user.id },
+      update: entry.company,
+      create: {
+        userId: user.id,
+        ...entry.company,
+      },
+    });
+
+    for (const item of entry.opportunities) {
+      const skillRows = item.skills.map((skill) => {
+        const catalog = skillByName.get(skill.name);
+        if (!catalog) {
+          throw new Error(`Unknown skill in opportunity seed: ${skill.name}`);
+        }
+        return {
+          skillId: catalog.id,
+          requiredProficiency: skill.requiredProficiency,
+          isRequired: skill.isRequired,
+        };
+      });
+
+      const existing = await prisma.opportunity.findFirst({
+        where: {
+          companyProfileId: company.id,
+          title: item.title,
+        },
+      });
+
+      const baseData = {
+        title: item.title,
+        description: item.description,
+        type: item.type,
+        location: item.location,
+        workMode: item.workMode,
+        duration: item.duration ?? null,
+        stipend: item.stipend ?? null,
+        salaryMin: item.salaryMin ?? null,
+        salaryMax: item.salaryMax ?? null,
+        applicationDeadline: deadlineFrom(item.applicationDeadline),
+        status: item.status,
+        publishedAt: item.status === "PUBLISHED" ? new Date("2026-09-01T00:00:00.000Z") : null,
+      };
+
+      const opportunity = existing
+        ? await prisma.opportunity.update({
+            where: { id: existing.id },
+            data: baseData,
+          })
+        : await prisma.opportunity.create({
+            data: {
+              ...baseData,
+              companyProfileId: company.id,
+            },
+          });
+
+      await prisma.opportunitySkill.deleteMany({
+        where: { opportunityId: opportunity.id },
+      });
+      await prisma.opportunitySkill.createMany({
+        data: skillRows.map((row) => ({
+          opportunityId: opportunity.id,
+          ...row,
+        })),
+      });
+    }
+  }
+}
+
 async function main() {
   await seedSkills();
   await seedAssessments();
-  console.log(`Seeded ${SKILLS.length} skills and ${ASSESSMENTS.length} assessments`);
+  await seedIndustryOpportunities();
+  console.log(
+    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length} assessments, and ${INDUSTRY_SEEDS.length} industry accounts`,
+  );
 }
 
 main()

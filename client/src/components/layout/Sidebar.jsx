@@ -29,12 +29,13 @@ const NAV_BY_ROLE = {
     { id: "skills", label: "My Skills", icon: Sparkles, to: "/app/skills" },
     { id: "assessments", label: "Skill Assessment", icon: ClipboardCheck, to: "/app/assessments" },
     { id: "intelligence", label: "Skill Intelligence", icon: LineChart, to: "/app/skill-intelligence" },
-    { id: "opportunities", label: "Opportunities", icon: Briefcase },
+    { id: "opportunities", label: "Opportunities", icon: Briefcase, to: "/app/opportunities" },
     { id: "applications", label: "Applications", icon: ClipboardList },
   ],
   INDUSTRY: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
-    { id: "opportunities", label: "Opportunities", icon: Briefcase },
+    { id: "company", label: "Company Profile", icon: Building2, to: "/app/company-profile" },
+    { id: "opportunities", label: "My Opportunities", icon: Briefcase, to: "/app/opportunities/manage" },
     { id: "candidates", label: "Candidates", icon: Users },
   ],
   ACADEMICIAN: [
