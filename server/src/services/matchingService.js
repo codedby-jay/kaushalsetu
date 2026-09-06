@@ -49,11 +49,6 @@ export async function getOpportunityMatch(userId, opportunityId) {
     throw new AppError("Opportunity not found", 404);
   }
 
-  const state = await loadStudentSkillState(userId);
-  if (!state.exists) {
-    throw new AppError("Create your profile to see your opportunity match.", 400);
-  }
-
   const record = await prisma.opportunity.findFirst({
     where: {
       id: opportunityId,
@@ -64,6 +59,11 @@ export async function getOpportunityMatch(userId, opportunityId) {
 
   if (!record) {
     throw new AppError("Opportunity not found", 404);
+  }
+
+  const state = await loadStudentSkillState(userId);
+  if (!state.exists) {
+    throw new AppError("Create your profile to see your opportunity match.", 400);
   }
 
   const serialized = serializeOpportunity(record, { includeStatus: false });
