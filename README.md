@@ -25,7 +25,7 @@ For each opportunity skill, student proficiency **S** is compared with required 
 
 The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
 
-## Current status (Phase 6)
+## Current status (Phase 7)
 
 Completed:
 
@@ -35,6 +35,7 @@ Completed:
 - Skill assessments, scoring, Skill Intelligence, industry readiness (Phase 4)
 - Industry company profiles, opportunities, skill requirements, student browse/filter (Phase 5)
 - Explainable skill matching (student → published opportunity) (Phase 6)
+- Career roles, skill roadmap, and dynamically recommended assessments (Phase 7)
 
 Not yet implemented: applications, ranking, analytics, academician portal, learning programmes, or portfolio.
 
@@ -47,8 +48,9 @@ Not yet implemented: applications, ranking, analytics, academician portal, learn
 | Student profile + skills | 3 |
 | Skill assessment + skill intelligence | 4 |
 | Industry opportunities | 5 |
-| Matching engine | 6 (this release) |
-| Applications + tracking | 7 |
+| Matching engine | 6 |
+| Career roadmap + dynamic assessments | 7 (this release) |
+| Applications + tracking | 8 |
 | Industry candidate ranking | 8 |
 | Institution analytics | 9 |
 | Learning programmes | 10 (post-MVP) |

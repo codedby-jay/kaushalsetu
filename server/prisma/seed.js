@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { ASSESSMENTS } from "./assessmentSeedData.js";
+import { FOCUSED_ASSESSMENTS } from "./careerAssessmentSeedData.js";
+import { CAREER_ROLES } from "./careerRoleSeedData.js";
 import { DEMO_INDUSTRY_PASSWORD, INDUSTRY_SEEDS } from "./opportunitySeedData.js";
 
 const prisma = new PrismaClient();
@@ -26,6 +28,10 @@ const SKILLS = [
   { name: "DSA", category: "TECHNICAL" },
   { name: "Docker", category: "TECHNICAL" },
   { name: "Linux", category: "TECHNICAL" },
+  { name: "OOP", category: "TECHNICAL" },
+  { name: "Spring Boot", category: "TECHNICAL" },
+  { name: "Django", category: "TECHNICAL" },
+  { name: "Data Analysis", category: "TECHNICAL" },
   { name: "Communication", category: "SOFT" },
   { name: "Leadership", category: "SOFT" },
   { name: "Teamwork", category: "SOFT" },
@@ -45,11 +51,11 @@ async function seedSkills() {
   }
 }
 
-async function seedAssessments() {
+async function seedAssessmentList(list) {
   const skills = await prisma.skill.findMany();
   const skillByName = new Map(skills.map((item) => [item.name, item]));
 
-  for (const assessment of ASSESSMENTS) {
+  for (const assessment of list) {
     const record = await prisma.assessment.upsert({
       where: { title: assessment.title },
       update: {
@@ -84,6 +90,46 @@ async function seedAssessments() {
           correctIndex: question.correctIndex,
           difficulty: question.difficulty,
           points: 1,
+          sortOrder: index + 1,
+        };
+      }),
+    });
+  }
+}
+
+async function seedCareerRoles() {
+  const skills = await prisma.skill.findMany();
+  const skillByName = new Map(skills.map((item) => [item.name, item]));
+
+  for (const role of CAREER_ROLES) {
+    const record = await prisma.careerRole.upsert({
+      where: { name: role.name },
+      update: {
+        description: role.description,
+        isActive: true,
+      },
+      create: {
+        name: role.name,
+        description: role.description,
+        isActive: true,
+      },
+    });
+
+    await prisma.careerRoleSkill.deleteMany({
+      where: { careerRoleId: record.id },
+    });
+
+    await prisma.careerRoleSkill.createMany({
+      data: role.skills.map((item, index) => {
+        const skill = skillByName.get(item.name);
+        if (!skill) {
+          throw new Error(`Unknown skill in career role seed: ${item.name}`);
+        }
+        return {
+          careerRoleId: record.id,
+          skillId: skill.id,
+          requiredProficiency: item.requiredProficiency,
+          isRequired: item.isRequired,
           sortOrder: index + 1,
         };
       }),
@@ -190,10 +236,12 @@ async function seedIndustryOpportunities() {
 
 async function main() {
   await seedSkills();
-  await seedAssessments();
+  await seedAssessmentList(ASSESSMENTS);
+  await seedAssessmentList(FOCUSED_ASSESSMENTS);
+  await seedCareerRoles();
   await seedIndustryOpportunities();
   console.log(
-    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length} assessments, and ${INDUSTRY_SEEDS.length} industry accounts`,
+    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length + FOCUSED_ASSESSMENTS.length} assessments, ${CAREER_ROLES.length} career roles, and ${INDUSTRY_SEEDS.length} industry accounts`,
   );
 }
 

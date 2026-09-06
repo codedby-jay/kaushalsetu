@@ -89,6 +89,7 @@ model StudentProfile {
   user               User                @relation(fields: [userId], references: [id], onDelete: Restrict)
   skills             StudentSkill[]
   assessmentAttempts AssessmentAttempt[]
+  careerGoal         StudentCareerGoal?
 }
 
 model Skill {
@@ -101,6 +102,7 @@ model Skill {
   assessmentQuestions    AssessmentQuestion[]
   skillAssessmentResults SkillAssessmentResult[]
   opportunitySkills      OpportunitySkill[]
+  careerRoleSkills       CareerRoleSkill[]
 }
 
 model StudentSkill {
@@ -243,4 +245,40 @@ model OpportunitySkill {
   skill                Skill       @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@unique([opportunityId, skillId])
+}
+
+model CareerRole {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  description String
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  skills      CareerRoleSkill[]
+  goals       StudentCareerGoal[]
+}
+
+model CareerRoleSkill {
+  id                   String     @id @default(uuid())
+  careerRoleId         String
+  skillId              String
+  requiredProficiency  Int
+  isRequired           Boolean    @default(true)
+  sortOrder            Int        @default(0)
+  createdAt            DateTime   @default(now())
+  careerRole           CareerRole @relation(fields: [careerRoleId], references: [id], onDelete: Cascade)
+  skill                Skill      @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@unique([careerRoleId, skillId])
+  @@index([careerRoleId, sortOrder])
+}
+
+model StudentCareerGoal {
+  id               String         @id @default(uuid())
+  studentProfileId String         @unique
+  careerRoleId     String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  profile          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  careerRole       CareerRole     @relation(fields: [careerRoleId], references: [id], onDelete: Restrict)
 }

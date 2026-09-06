@@ -197,3 +197,28 @@ export async function getOpportunityMatch(id) {
   const response = await api.get(`/opportunities/${id}/match`);
   return response.data;
 }
+
+export async function getCareerRoles() {
+  const response = await api.get("/career-roles");
+  return response.data;
+}
+
+export async function getCareerRole(id) {
+  const response = await api.get(`/career-roles/${id}`);
+  return response.data;
+}
+
+export async function getCareerGoal() {
+  const response = await api.get("/student/career-goal");
+  return response.data;
+}
+
+export async function saveCareerGoal(data) {
+  const response = await api.put("/student/career-goal", data);
+  return response.data;
+}
+
+export async function getCareerRoadmap() {
+  const response = await api.get("/student/career-roadmap");
+  return response.data;
+}

@@ -9,6 +9,7 @@ import {
   getApiErrorMessage,
   getAssessmentHistory,
   getAssessments,
+  getCareerRoadmap,
   getStudentProfile,
 } from "../../services/api.js";
 
@@ -18,6 +19,8 @@ export function StudentAssessmentsPage() {
   const [hasProfile, setHasProfile] = useState(true);
   const [assessments, setAssessments] = useState([]);
   const [attempts, setAttempts] = useState([]);
+  const [recommended, setRecommended] = useState([]);
+  const [goalName, setGoalName] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -29,12 +32,20 @@ export function StudentAssessmentsPage() {
         if (!profile.data.exists) {
           return;
         }
-        const [list, history] = await Promise.all([
+        const [list, history, roadmap] = await Promise.all([
           getAssessments(),
           getAssessmentHistory(),
+          getCareerRoadmap().catch(() => null),
         ]);
         setAssessments(list.data.assessments);
         setAttempts(history.data.attempts);
+        if (roadmap?.data?.exists) {
+          setRecommended(roadmap.data.recommendedAssessments || []);
+          setGoalName(roadmap.data.role?.name || "");
+        } else {
+          setRecommended([]);
+          setGoalName("");
+        }
       } catch (err) {
         setError(getApiErrorMessage(err, "Unable to load assessments."));
       } finally {
@@ -52,8 +63,8 @@ export function StudentAssessmentsPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Skill Assessment</h1>
         <p className="mt-1 text-sm text-secondary">
-          Complete an assessment to generate an evidence-based Skill Intelligence
-          profile.
+          Recommended assessments follow your career goal. The full catalog remains
+          available below.
         </p>
 
         {loading ? (
@@ -74,7 +85,45 @@ export function StudentAssessmentsPage() {
           </Card>
         ) : (
           <>
-            <div className="mt-6 flex flex-col gap-3">
+            {recommended.length > 0 ? (
+              <div className="mt-6">
+                <h2 className="text-sm font-semibold text-text">
+                  Recommended for your career goal
+                  {goalName ? ` · ${goalName}` : ""}
+                </h2>
+                <p className="mt-1 text-xs text-secondary">
+                  Ranked by skill gap and how focused each paper is on the unmet skill.
+                </p>
+                <div className="mt-3 flex flex-col gap-3">
+                  {recommended.map((item) => (
+                    <Card key={item.assessmentId} className="p-5">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="text-[15px] font-semibold text-text">{item.title}</h3>
+                          <p className="mt-1 text-sm text-secondary">
+                            {item.forSkill.skillName}: {item.forSkill.currentProficiency}/
+                            {item.forSkill.requiredProficiency} (gap {item.forSkill.gap})
+                          </p>
+                        </div>
+                        <Link to={`/app/assessments/${item.assessmentId}`}>
+                          <Button>Open</Button>
+                        </Link>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-6 text-sm text-secondary">
+                <Link to="/app/career-roadmap" className="font-medium text-primary">
+                  Set a career goal
+                </Link>{" "}
+                to see recommended assessments for unmet skills.
+              </p>
+            )}
+
+            <h2 className="mt-8 text-sm font-semibold text-text">All assessments</h2>
+            <div className="mt-3 flex flex-col gap-3">
               {assessments.map((item) => (
                 <Card key={item.id} className="p-5">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

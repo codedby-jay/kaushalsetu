@@ -61,9 +61,14 @@ export function SkillIntelligencePage() {
               title="Complete your first skill assessment to generate your Skill Intelligence profile."
               description="Answers are scored against mapped skills. Readiness is the average of those skill scores."
               action={
-                <Link to="/app/assessments">
-                  <Button>Take Assessment</Button>
-                </Link>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Link to="/app/career-roadmap">
+                    <Button>Career Roadmap</Button>
+                  </Link>
+                  <Link to="/app/assessments">
+                    <Button variant="secondary">Take Assessment</Button>
+                  </Link>
+                </div>
               }
             />
           </Card>
