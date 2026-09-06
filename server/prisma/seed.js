@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { ASSESSMENTS } from "./assessmentSeedData.js";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,7 @@ const SKILLS = [
   { name: "REST APIs", category: "TECHNICAL" },
   { name: "Data Structures", category: "TECHNICAL" },
   { name: "Algorithms", category: "TECHNICAL" },
+  { name: "DSA", category: "TECHNICAL" },
   { name: "Docker", category: "TECHNICAL" },
   { name: "Communication", category: "SOFT" },
   { name: "Leadership", category: "SOFT" },
@@ -30,7 +32,7 @@ const SKILLS = [
   { name: "Critical Thinking", category: "SOFT" },
 ];
 
-async function main() {
+async function seedSkills() {
   for (const skill of SKILLS) {
     await prisma.skill.upsert({
       where: { name: skill.name },
@@ -38,8 +40,58 @@ async function main() {
       create: skill,
     });
   }
+}
 
-  console.log(`Seeded ${SKILLS.length} skills`);
+async function seedAssessments() {
+  const skills = await prisma.skill.findMany();
+  const skillByName = new Map(skills.map((item) => [item.name, item]));
+
+  for (const assessment of ASSESSMENTS) {
+    const record = await prisma.assessment.upsert({
+      where: { title: assessment.title },
+      update: {
+        description: assessment.description,
+        isActive: true,
+      },
+      create: {
+        title: assessment.title,
+        description: assessment.description,
+        isActive: true,
+      },
+    });
+
+    const existingCount = await prisma.assessmentQuestion.count({
+      where: { assessmentId: record.id },
+    });
+    if (existingCount > 0) {
+      continue;
+    }
+
+    await prisma.assessmentQuestion.createMany({
+      data: assessment.questions.map((question, index) => {
+        const skill = skillByName.get(question.skill);
+        if (!skill) {
+          throw new Error(`Unknown skill in seed: ${question.skill}`);
+        }
+        return {
+          assessmentId: record.id,
+          skillId: skill.id,
+          questionText: question.questionText,
+          options: question.options,
+          correctIndex: question.correctIndex,
+          difficulty: question.difficulty,
+          points: 1,
+          sortOrder: index + 1,
+        };
+      }),
+    });
+  }
+}
+
+async function main() {
+  await seedSkills();
+  await seedAssessments();
+  console.log(`Seeded ${SKILLS.length} skills and ${ASSESSMENTS.length} assessments`);
 }
 
 main()

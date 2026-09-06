@@ -5,6 +5,10 @@ import { AppShellPage } from "../pages/AppShellPage.jsx";
 import { LandingPage } from "../pages/LandingPage.jsx";
 import { LoginPage } from "../pages/LoginPage.jsx";
 import { RegisterPage } from "../pages/RegisterPage.jsx";
+import { StudentAssessmentsPage } from "../pages/student/StudentAssessmentsPage.jsx";
+import { AssessmentTakePage } from "../pages/student/AssessmentTakePage.jsx";
+import { AssessmentResultPage } from "../pages/student/AssessmentResultPage.jsx";
+import { SkillIntelligencePage } from "../pages/student/SkillIntelligencePage.jsx";
 import { StudentProfilePage } from "../pages/student/StudentProfilePage.jsx";
 import { StudentSkillsPage } from "../pages/student/StudentSkillsPage.jsx";
 
@@ -43,6 +47,38 @@ export function AppRoutes() {
         element={
           <StudentRoute>
             <StudentSkillsPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/assessments"
+        element={
+          <StudentRoute>
+            <StudentAssessmentsPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/assessments/results/:attemptId"
+        element={
+          <StudentRoute>
+            <AssessmentResultPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/assessments/:id"
+        element={
+          <StudentRoute>
+            <AssessmentTakePage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/skill-intelligence"
+        element={
+          <StudentRoute>
+            <SkillIntelligencePage />
           </StudentRoute>
         }
       />

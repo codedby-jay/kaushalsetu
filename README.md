@@ -25,16 +25,16 @@ For each required skill:
 
 The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented yet**.
 
-## Current status (Phase 3)
+## Current status (Phase 4)
 
 Completed:
 
 - Foundation, design system, health API (Phase 1)
 - Authentication, JWT, RBAC (Phase 2)
-- Student profile create/update/delete
-- Skill catalog and student skill proficiency (0–10)
+- Student profile and skills (Phase 3)
+- Skill assessments, scoring, Skill Intelligence, industry readiness
 
-Not yet implemented: skill assessment, matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
@@ -42,8 +42,8 @@ Not yet implemented: skill assessment, matching, opportunities, applications, an
 | --- | --- |
 | Foundation + UI design system | 1 |
 | Authentication + RBAC | 2 |
-| Student profile + skills | 3 (this release) |
-| Skill assessment + skill intelligence | 4 |
+| Student profile + skills | 3 |
+| Skill assessment + skill intelligence | 4 (this release) |
 | Industry opportunities | 5 |
 | Matching engine | 6 |
 | Applications + tracking | 7 |
@@ -211,12 +211,23 @@ App: `http://localhost:5173`
 | PUT | `/api/student/skills/:skillId` | Update proficiency |
 | DELETE | `/api/student/skills/:skillId` | Remove skill |
 | GET | `/api/skills` | Skill catalog (authenticated) |
+| GET | `/api/assessments` | Active assessments (STUDENT) |
+| GET | `/api/assessments/:id` | Questions without correct answers |
+| POST | `/api/assessments/:id/start` | Start or resume attempt |
+| POST | `/api/assessments/:id/submit` | Score and update skills |
+| GET | `/api/student/assessments/history` | Own attempts |
+| GET | `/api/student/assessment-results/:attemptId` | Result + intelligence |
+| GET | `/api/student/skill-intelligence` | Latest per-skill intelligence |
 | UI | `/` | Landing page |
 | UI | `/register` | Registration |
 | UI | `/login` | Sign in |
 | UI | `/app` | Protected application shell |
 | UI | `/app/profile` | Student profile (STUDENT) |
 | UI | `/app/skills` | Student skills (STUDENT) |
+| UI | `/app/assessments` | Assessment list |
+| UI | `/app/assessments/:id` | Take assessment |
+| UI | `/app/assessments/results/:attemptId` | Result |
+| UI | `/app/skill-intelligence` | Skill Intelligence |
 
 ## Development phases
 
