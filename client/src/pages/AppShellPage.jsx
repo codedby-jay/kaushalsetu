@@ -23,8 +23,8 @@ export function AppShellPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-secondary">
-          Signed in as {user?.name} · {roleLabel}. Role-specific modules will be
-          introduced in later phases.
+          Signed in as {user?.name} · {roleLabel}. Use My Profile and My Skills to
+          complete your student record. Other modules arrive in later phases.
         </p>
         <div className="mt-6 rounded-md border border-border bg-surface">
           <EmptyState

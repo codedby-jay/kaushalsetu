@@ -23,28 +23,26 @@ For each required skill:
 
 `matchPercentage = (earned points / total possible points) × 100`
 
-The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented in Phase 1**.
+The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented yet**.
 
-## Current status (Phase 2)
+## Current status (Phase 3)
 
 Completed:
 
-- Project structure, design system, landing page, and application shell (Phase 1)
-- User registration and login
-- Password hashing with bcryptjs
-- JWT access tokens and authentication middleware
-- Role-based authorization middleware
-- Protected `/app` shell that shows the signed-in name and role
+- Foundation, design system, health API (Phase 1)
+- Authentication, JWT, RBAC (Phase 2)
+- Student profile create/update/delete
+- Skill catalog and student skill proficiency (0–10)
 
-Not yet implemented: student profiles, skill assessment, matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: skill assessment, matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
 | Module | Phase |
 | --- | --- |
 | Foundation + UI design system | 1 |
-| Authentication + RBAC | 2 (this release) |
-| Student profile + skills | 3 |
+| Authentication + RBAC | 2 |
+| Student profile + skills | 3 (this release) |
 | Skill assessment + skill intelligence | 4 |
 | Industry opportunities | 5 |
 | Matching engine | 6 |
@@ -162,6 +160,7 @@ cd server
 npx prisma validate
 npx prisma migrate dev
 npx prisma generate
+npx prisma db seed
 ```
 
 On Linux/macOS with `psql` instead of `dropdb`/`createdb`:
@@ -203,10 +202,21 @@ App: `http://localhost:5173`
 | POST | `/api/auth/login` | Returns JWT + user |
 | GET | `/api/auth/me` | Current user (Bearer token) |
 | GET | `/api/auth/student-only` | RBAC demo: STUDENT 200, others 403 |
+| GET | `/api/student/profile` | Own student profile (STUDENT) |
+| POST | `/api/student/profile` | Create profile |
+| PUT | `/api/student/profile` | Update profile |
+| DELETE | `/api/student/profile` | Delete profile (not the User) |
+| GET | `/api/student/skills` | Own skills + summary |
+| POST | `/api/student/skills` | Add skill |
+| PUT | `/api/student/skills/:skillId` | Update proficiency |
+| DELETE | `/api/student/skills/:skillId` | Remove skill |
+| GET | `/api/skills` | Skill catalog (authenticated) |
 | UI | `/` | Landing page |
 | UI | `/register` | Registration |
 | UI | `/login` | Sign in |
 | UI | `/app` | Protected application shell |
+| UI | `/app/profile` | Student profile (STUDENT) |
+| UI | `/app/skills` | Student skills (STUDENT) |
 
 ## Development phases
 
