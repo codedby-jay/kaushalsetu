@@ -141,3 +141,11 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma local artifacts (keep migrations in git)
+*.db
+*.db-journal
