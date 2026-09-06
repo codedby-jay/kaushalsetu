@@ -40,7 +40,12 @@ export async function fetchCurrentUser() {
 }
 
 export function getApiErrorMessage(error, fallback = "Something went wrong") {
-  return error.response?.data?.message || fallback;
+  const data = error.response?.data;
+  const fieldError = data?.errors && Object.values(data.errors).find(Boolean);
+  if (typeof fieldError === "string") {
+    return fieldError;
+  }
+  return data?.message || fallback;
 }
 
 export async function getStudentProfile() {
@@ -120,5 +125,70 @@ export async function getAssessmentResult(attemptId) {
 
 export async function getSkillIntelligence() {
   const response = await api.get("/student/skill-intelligence");
+  return response.data;
+}
+
+export async function getCompanyProfile() {
+  const response = await api.get("/industry/company-profile");
+  return response.data;
+}
+
+export async function createCompanyProfile(data) {
+  const response = await api.post("/industry/company-profile", data);
+  return response.data;
+}
+
+export async function updateCompanyProfile(data) {
+  const response = await api.put("/industry/company-profile", data);
+  return response.data;
+}
+
+export async function getIndustryOpportunities() {
+  const response = await api.get("/industry/opportunities");
+  return response.data;
+}
+
+export async function getIndustryOpportunity(id) {
+  const response = await api.get(`/industry/opportunities/${id}`);
+  return response.data;
+}
+
+export async function createIndustryOpportunity(data) {
+  const response = await api.post("/industry/opportunities", data);
+  return response.data;
+}
+
+export async function updateIndustryOpportunity(id, data) {
+  const response = await api.put(`/industry/opportunities/${id}`, data);
+  return response.data;
+}
+
+export async function deleteIndustryOpportunity(id) {
+  const response = await api.delete(`/industry/opportunities/${id}`);
+  return response.data;
+}
+
+export async function publishIndustryOpportunity(id) {
+  const response = await api.patch(`/industry/opportunities/${id}/publish`);
+  return response.data;
+}
+
+export async function unpublishIndustryOpportunity(id) {
+  const response = await api.patch(`/industry/opportunities/${id}/unpublish`);
+  return response.data;
+}
+
+export async function closeIndustryOpportunity(id) {
+  const response = await api.patch(`/industry/opportunities/${id}/close`);
+  return response.data;
+}
+
+export async function getPublishedOpportunities(params = {}) {
+  const response = await api.get("/opportunities", { params });
+  return response.data;
+}
+
+export async function getPublishedOpportunity(id) {
+  const response = await api.get(`/opportunities/${id}`);
   return response.data;
 }

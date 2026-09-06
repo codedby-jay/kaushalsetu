@@ -12,10 +12,32 @@ import { SkillIntelligencePage } from "../pages/student/SkillIntelligencePage.js
 import { StudentProfilePage } from "../pages/student/StudentProfilePage.jsx";
 import { StudentSkillsPage } from "../pages/student/StudentSkillsPage.jsx";
 
+import { StudentOpportunitiesPage } from "../pages/student/StudentOpportunitiesPage.jsx";
+import { CompanyProfilePage } from "../pages/industry/CompanyProfilePage.jsx";
+import { IndustryOpportunitiesPage } from "../pages/industry/IndustryOpportunitiesPage.jsx";
+import { OpportunityFormPage } from "../pages/industry/OpportunityFormPage.jsx";
+import { OpportunityDetailsPage } from "../pages/opportunities/OpportunityDetailsPage.jsx";
+
 function StudentRoute({ children }) {
   return (
     <ProtectedRoute>
       <RoleRoute allowedRoles={["STUDENT"]}>{children}</RoleRoute>
+    </ProtectedRoute>
+  );
+}
+
+function IndustryRoute({ children }) {
+  return (
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={["INDUSTRY"]}>{children}</RoleRoute>
+    </ProtectedRoute>
+  );
+}
+
+function OpportunityViewRoute({ children }) {
+  return (
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={["STUDENT", "INDUSTRY"]}>{children}</RoleRoute>
     </ProtectedRoute>
   );
 }
@@ -80,6 +102,54 @@ export function AppRoutes() {
           <StudentRoute>
             <SkillIntelligencePage />
           </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities"
+        element={
+          <StudentRoute>
+            <StudentOpportunitiesPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/company-profile"
+        element={
+          <IndustryRoute>
+            <CompanyProfilePage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities/manage"
+        element={
+          <IndustryRoute>
+            <IndustryOpportunitiesPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities/create"
+        element={
+          <IndustryRoute>
+            <OpportunityFormPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities/:id/edit"
+        element={
+          <IndustryRoute>
+            <OpportunityFormPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities/:id"
+        element={
+          <OpportunityViewRoute>
+            <OpportunityDetailsPage />
+          </OpportunityViewRoute>
         }
       />
     </Routes>

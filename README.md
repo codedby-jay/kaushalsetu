@@ -25,16 +25,17 @@ For each required skill:
 
 The API will return match percentage, matched skills, and skill gaps (current, required, gap). That engine is **not implemented yet**.
 
-## Current status (Phase 4)
+## Current status (Phase 5)
 
 Completed:
 
 - Foundation, design system, health API (Phase 1)
 - Authentication, JWT, RBAC (Phase 2)
 - Student profile and skills (Phase 3)
-- Skill assessments, scoring, Skill Intelligence, industry readiness
+- Skill assessments, scoring, Skill Intelligence, industry readiness (Phase 4)
+- Industry company profiles, opportunities, skill requirements, student browse/filter (Phase 5)
 
-Not yet implemented: matching, opportunities, applications, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: matching, applications, ranking, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
@@ -43,8 +44,8 @@ Not yet implemented: matching, opportunities, applications, analytics, academici
 | Foundation + UI design system | 1 |
 | Authentication + RBAC | 2 |
 | Student profile + skills | 3 |
-| Skill assessment + skill intelligence | 4 (this release) |
-| Industry opportunities | 5 |
+| Skill assessment + skill intelligence | 4 |
+| Industry opportunities | 5 (this release) |
 | Matching engine | 6 |
 | Applications + tracking | 7 |
 | Industry candidate ranking | 8 |
@@ -150,6 +151,9 @@ The repository includes a committed migration history:
 
 1. `init_user_foundation` — Phase 1 schema
 2. `add_authentication` — `User.name` and default role `STUDENT`
+3. `add_student_profile_and_skills` — Phase 3
+4. `add_skill_assessment_system` — Phase 4
+5. `add_industry_opportunities` — Phase 5
 
 If you already created a local `kaushalsetu` database during Phase 1 (no git migration history), treat it as disposable and recreate it:
 
@@ -171,6 +175,13 @@ psql -d postgres -c "CREATE DATABASE kaushalsetu;"
 ```
 
 Do **not** use `prisma db push`. Fresh clones should use `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (apply existing migrations only).
+
+Existing databases should apply Phase 5 with `npx prisma migrate deploy` (do not `migrate reset`). Seed is idempotent and creates demo industry accounts only when those emails are missing:
+
+- `industry.abc@kaushalsetu.demo` / `KaushalSetu@2026` — ABC Technologies
+- `industry.nova@kaushalsetu.demo` / `KaushalSetu@2026` — Nova Software
+
+Existing passwords for those emails are never overwritten.
 
 `npx prisma generate` does **not** require a live database, but it does need `DATABASE_URL` to be set.
 
