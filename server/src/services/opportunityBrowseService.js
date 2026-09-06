@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { AppError } from "../utils/AppError.js";
+import { attachOpportunityMatches } from "./matchingService.js";
 import { opportunityInclude, serializeOpportunity } from "../utils/opportunity.js";
 import { parseBrowseFilters } from "../validators/opportunityValidators.js";
 
@@ -32,7 +33,7 @@ function buildWhere(filters) {
   return where;
 }
 
-export async function listPublishedOpportunities(query) {
+export async function listPublishedOpportunities(query, userId) {
   const filters = parseBrowseFilters(query);
   const records = await prisma.opportunity.findMany({
     where: buildWhere(filters),
@@ -40,7 +41,11 @@ export async function listPublishedOpportunities(query) {
     orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
   });
 
-  return records.map((item) => serializeOpportunity(item, { includeStatus: false }));
+  const opportunities = records.map((item) =>
+    serializeOpportunity(item, { includeStatus: false }),
+  );
+
+  return attachOpportunityMatches(userId, opportunities);
 }
 
 export async function getPublishedOpportunity(opportunityId) {

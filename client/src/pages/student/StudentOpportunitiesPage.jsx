@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/Button.jsx";
 import { Card } from "../../components/ui/Card.jsx";
 import { EmptyState } from "../../components/ui/EmptyState.jsx";
 import { Input } from "../../components/ui/Input.jsx";
+import { MatchScore, SkillMatchRow } from "../../components/ui/MatchScore.jsx";
 import { AppLayout } from "../../layouts/AppLayout.jsx";
 import { getApiErrorMessage, getPublishedOpportunities } from "../../services/api.js";
 import {
@@ -69,6 +70,8 @@ export function StudentOpportunitiesPage() {
     load(filters);
   }
 
+  const matchReason = opportunities[0]?.match?.reason;
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl">
@@ -77,8 +80,9 @@ export function StudentOpportunitiesPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Opportunities</h1>
         <p className="mt-1 text-sm text-secondary">
-          Browse published internships and jobs. Required skill levels are shown without a
-          personalised match score.
+          Browse published internships and jobs. Skill match compares your proficiency
+          (0–10) with each listing’s required proficiency. This is an explainable
+          formula, not an AI model.
         </p>
 
         <Card className="mt-6 p-4">
@@ -148,6 +152,34 @@ export function StudentOpportunitiesPage() {
           </p>
         ) : null}
 
+        {!loading && matchReason === "NO_PROFILE" ? (
+          <Card className="mt-4 p-5">
+            <EmptyState
+              title="Create your profile to see your opportunity match"
+              description="Listings are still visible. A student profile is required before skill match can be calculated."
+              action={
+                <Link to="/app/profile">
+                  <Button>Create Profile</Button>
+                </Link>
+              }
+            />
+          </Card>
+        ) : null}
+
+        {!loading && matchReason === "NO_SKILLS" ? (
+          <Card className="mt-4 p-5">
+            <EmptyState
+              title="Add skills to your profile to calculate your match"
+              description="Match scores use your StudentSkill proficiency against each opportunity’s required proficiency."
+              action={
+                <Link to="/app/skills">
+                  <Button>Add Skills</Button>
+                </Link>
+              }
+            />
+          </Card>
+        ) : null}
+
         {loading ? (
           <p className="mt-8 text-sm text-secondary">Loading opportunities…</p>
         ) : opportunities.length === 0 ? (
@@ -171,25 +203,46 @@ export function StudentOpportunitiesPage() {
                       {item.location} · {workModeLabel(item.workMode)}
                     </p>
                   </div>
-                  <Badge variant="primary">{typeLabel(item.type)}</Badge>
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge variant="primary">{typeLabel(item.type)}</Badge>
+                    {item.match?.available ? <MatchScore match={item.match} /> : null}
+                  </div>
                 </div>
                 {item.duration ? (
                   <p className="mt-3 text-sm text-text">{item.duration}</p>
                 ) : null}
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {item.skills.map((skill) => (
-                    <Badge key={skill.skillId}>
-                      {skill.name} {skill.requiredProficiency}/10
-                    </Badge>
-                  ))}
-                </div>
+                {item.match?.available ? (
+                  <>
+                    <p className="mt-3 text-sm text-secondary">{item.match.summary}</p>
+                    <ul className="mt-3 grid gap-1">
+                      {(item.match.skills || []).slice(0, 4).map((skill) => (
+                        <SkillMatchRow key={skill.skillId} item={skill} />
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {item.skills.map((skill) => (
+                      <Badge key={skill.skillId}>
+                        {skill.name} {skill.requiredProficiency}/10
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 <p className="mt-3 text-sm text-secondary">
                   Application deadline: {formatOpportunityDate(item.applicationDeadline)}
                 </p>
-                <div className="mt-4">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <Link to={`/app/opportunities/${item.id}`}>
                     <Button size="sm">View details</Button>
                   </Link>
+                  {item.match?.available ? (
+                    <Link to={`/app/opportunities/${item.id}#your-match`}>
+                      <Button size="sm" variant="secondary">
+                        Why this match?
+                      </Button>
+                    </Link>
+                  ) : null}
                 </div>
               </Card>
             ))}
