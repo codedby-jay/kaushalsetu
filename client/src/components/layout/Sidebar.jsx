@@ -6,8 +6,10 @@ import {
   LayoutDashboard,
   LineChart,
   Sparkles,
+  UserRound,
   Users,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { cn } from "../../utils/cn.js";
 
@@ -21,31 +23,32 @@ const ROLE_LABELS = {
 
 const NAV_BY_ROLE = {
   STUDENT: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-    { id: "skills", label: "My Skills", icon: Sparkles, available: false },
-    { id: "opportunities", label: "Opportunities", icon: Briefcase, available: false },
-    { id: "applications", label: "Applications", icon: ClipboardList, available: false },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
+    { id: "profile", label: "My Profile", icon: UserRound, to: "/app/profile" },
+    { id: "skills", label: "My Skills", icon: Sparkles, to: "/app/skills" },
+    { id: "opportunities", label: "Opportunities", icon: Briefcase },
+    { id: "applications", label: "Applications", icon: ClipboardList },
   ],
   INDUSTRY: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-    { id: "opportunities", label: "Opportunities", icon: Briefcase, available: false },
-    { id: "candidates", label: "Candidates", icon: Users, available: false },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
+    { id: "opportunities", label: "Opportunities", icon: Briefcase },
+    { id: "candidates", label: "Candidates", icon: Users },
   ],
   ACADEMICIAN: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-    { id: "faculty", label: "Faculty Opportunities", icon: Briefcase, available: false },
-    { id: "research", label: "Research", icon: GraduationCap, available: false },
-    { id: "consultancy", label: "Consultancy", icon: Building2, available: false },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
+    { id: "faculty", label: "Faculty Opportunities", icon: Briefcase },
+    { id: "research", label: "Research", icon: GraduationCap },
+    { id: "consultancy", label: "Consultancy", icon: Building2 },
   ],
   INSTITUTION: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-    { id: "students", label: "Students", icon: Users, available: false },
-    { id: "analytics", label: "Analytics", icon: LineChart, available: false },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
+    { id: "students", label: "Students", icon: Users },
+    { id: "analytics", label: "Analytics", icon: LineChart },
   ],
   ADMIN: [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, available: true },
-    { id: "users", label: "Users", icon: Users, available: false },
-    { id: "analytics", label: "Analytics", icon: LineChart, available: false },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
+    { id: "users", label: "Users", icon: Users },
+    { id: "analytics", label: "Analytics", icon: LineChart },
   ],
 };
 
@@ -69,31 +72,42 @@ export function Sidebar() {
       <nav className="flex flex-col gap-0.5 p-3" aria-label="Application">
         {items.map((item) => {
           const Icon = item.icon;
+          if (!item.to) {
+            return (
+              <div
+                key={item.id}
+                className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-secondary"
+                title="This module will be introduced in a later phase"
+                aria-disabled="true"
+              >
+                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{item.label}</span>
+              </div>
+            );
+          }
+
           return (
-            <div
+            <NavLink
               key={item.id}
-              className={cn(
-                "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm",
-                item.available
-                  ? "bg-primary/8 font-medium text-primary"
-                  : "cursor-not-allowed text-secondary",
-              )}
-              title={
-                item.available
-                  ? undefined
-                  : "This module will be introduced in a later phase"
+              to={item.to}
+              end={item.to === "/app"}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm no-underline",
+                  isActive
+                    ? "bg-primary/8 font-medium text-primary"
+                    : "text-text hover:bg-background",
+                )
               }
-              aria-current={item.available ? "page" : undefined}
-              aria-disabled={!item.available}
             >
               <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{item.label}</span>
-            </div>
+            </NavLink>
           );
         })}
       </nav>
       <p className="mt-auto px-4 pb-4 text-[11px] leading-relaxed text-secondary">
-        Navigation besides Dashboard is a placeholder until later phases.
+        Greyed items are placeholders for later phases.
       </p>
     </aside>
   );

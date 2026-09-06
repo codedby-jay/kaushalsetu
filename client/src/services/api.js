@@ -42,3 +42,48 @@ export async function fetchCurrentUser() {
 export function getApiErrorMessage(error, fallback = "Something went wrong") {
   return error.response?.data?.message || fallback;
 }
+
+export async function getStudentProfile() {
+  const response = await api.get("/student/profile");
+  return response.data;
+}
+
+export async function createStudentProfile(data) {
+  const response = await api.post("/student/profile", data);
+  return response.data;
+}
+
+export async function updateStudentProfile(data) {
+  const response = await api.put("/student/profile", data);
+  return response.data;
+}
+
+export async function deleteStudentProfile() {
+  const response = await api.delete("/student/profile");
+  return response.data;
+}
+
+export async function getSkills() {
+  const response = await api.get("/skills");
+  return response.data;
+}
+
+export async function getStudentSkills() {
+  const response = await api.get("/student/skills");
+  return response.data;
+}
+
+export async function addStudentSkill(data) {
+  const response = await api.post("/student/skills", data);
+  return response.data;
+}
+
+export async function updateStudentSkill(skillId, data) {
+  const response = await api.put(`/student/skills/${skillId}`, data);
+  return response.data;
+}
+
+export async function removeStudentSkill(skillId) {
+  const response = await api.delete(`/student/skills/${skillId}`);
+  return response.data;
+}
