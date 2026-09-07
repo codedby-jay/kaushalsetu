@@ -136,6 +136,15 @@ export async function updateIndustryOpportunity(userId, opportunityId, body) {
 
 export async function deleteIndustryOpportunity(userId, opportunityId) {
   const { opportunity } = await getOwnedOpportunity(userId, opportunityId);
+  const applicationCount = await prisma.application.count({
+    where: { opportunityId: opportunity.id },
+  });
+  if (applicationCount > 0) {
+    throw new AppError(
+      "Opportunities with applications cannot be deleted. Close the listing instead.",
+      409,
+    );
+  }
   await prisma.opportunity.delete({
     where: { id: opportunity.id },
   });

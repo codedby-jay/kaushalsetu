@@ -23,14 +23,15 @@ export function AppShellPage() {
         </p>
         <h1 className="mt-1 text-xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-secondary">
-          Signed in as {user?.name} · {roleLabel}. Students can set a career goal,
-          take recommended assessments, and see explainable opportunity matches.
+          Signed in as {user?.name} · {roleLabel}. Students can apply to published
+          opportunities and track application status. Industry can review applicants
+          for their own listings.
         </p>
         <div className="mt-6 rounded-md border border-border bg-surface">
           <EmptyState
             icon={Layers}
-            title="Modules arrive in later phases"
-            description="Applications, candidate ranking, and institution analytics will be built in later phases. Skill assessment, Skill Intelligence, opportunities, and skill matching are available in the sidebar."
+            title="Workspace overview"
+            description="Skill assessment, career roadmap, opportunities, applications, and explainable matching are available from the sidebar. Candidate ranking and institution analytics arrive in later phases."
           />
         </div>
       </div>

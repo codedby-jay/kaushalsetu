@@ -25,7 +25,7 @@ For each opportunity skill, student proficiency **S** is compared with required 
 
 The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
 
-## Current status (Phase 7)
+## Current status (Phase 8)
 
 Completed:
 
@@ -36,8 +36,9 @@ Completed:
 - Industry company profiles, opportunities, skill requirements, student browse/filter (Phase 5)
 - Explainable skill matching (student → published opportunity) (Phase 6)
 - Career roles, skill roadmap, and dynamically recommended assessments (Phase 7)
+- Student applications, tracking, and industry application status (Phase 8)
 
-Not yet implemented: applications, ranking, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: candidate ranking, analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
@@ -49,10 +50,10 @@ Not yet implemented: applications, ranking, analytics, academician portal, learn
 | Skill assessment + skill intelligence | 4 |
 | Industry opportunities | 5 |
 | Matching engine | 6 |
-| Career roadmap + dynamic assessments | 7 (this release) |
-| Applications + tracking | 8 |
-| Industry candidate ranking | 8 |
-| Institution analytics | 9 |
+| Career roadmap + dynamic assessments | 7 |
+| Applications + tracking | 8 (this release) |
+| Industry candidate ranking | 9 |
+| Institution analytics | 10 |
 | Learning programmes | 10 (post-MVP) |
 | Digital portfolio | 11 |
 | Academician portal | 12 |
@@ -241,7 +242,18 @@ App: `http://localhost:5173`
 | UI | `/app/assessments` | Assessment list |
 | UI | `/app/assessments/:id` | Take assessment |
 | UI | `/app/assessments/results/:attemptId` | Result |
-| UI | `/app/skill-intelligence` | Skill Intelligence |
+| POST | `/api/opportunities/:id/apply` | Student apply (STUDENT, published only) |
+| GET | `/api/student/applications` | Own applications |
+| GET | `/api/student/applications/:id` | Own application detail |
+| PATCH | `/api/student/applications/:id/withdraw` | Withdraw eligible application |
+| GET | `/api/industry/opportunities/:id/applications` | Applications for owned listing |
+| GET | `/api/industry/applications/:id` | Owned application detail |
+| PATCH | `/api/industry/applications/:id/status` | Valid industry status transition |
+| UI | `/app/applications` | Student applications |
+| UI | `/app/applications/:id` | Student application detail |
+| UI | `/app/opportunities/:id/apply` | Apply form |
+| UI | `/app/opportunities/:id/applications` | Industry applicant list |
+| UI | `/app/industry/applications/:id` | Industry application review |
 
 ## Development phases
 
@@ -253,9 +265,10 @@ Work proceeds **one phase at a time**. Do not start the next phase until it is e
 4. Skill assessment + skill intelligence  
 5. Industry opportunities  
 6. Matching engine  
-7. Applications + tracking  
-8. Industry candidate ranking  
-9. Institution analytics  
+7. Career roadmap + dynamic assessments  
+8. Applications + tracking (this release)  
+9. Industry candidate ranking  
+10. Institution analytics  
 
 Post-MVP: learning programmes, digital portfolio, academician portal, verification, optional AI resume parsing, SIH polish.
 

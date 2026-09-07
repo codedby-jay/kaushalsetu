@@ -14,10 +14,15 @@ import { StudentSkillsPage } from "../pages/student/StudentSkillsPage.jsx";
 import { CareerRoadmapPage } from "../pages/student/CareerRoadmapPage.jsx";
 
 import { StudentOpportunitiesPage } from "../pages/student/StudentOpportunitiesPage.jsx";
+import { StudentApplicationsPage } from "../pages/student/StudentApplicationsPage.jsx";
+import { StudentApplicationDetailPage } from "../pages/student/StudentApplicationDetailPage.jsx";
+import { ApplyOpportunityPage } from "../pages/student/ApplyOpportunityPage.jsx";
 import { CompanyProfilePage } from "../pages/industry/CompanyProfilePage.jsx";
 import { IndustryOpportunitiesPage } from "../pages/industry/IndustryOpportunitiesPage.jsx";
 import { OpportunityFormPage } from "../pages/industry/OpportunityFormPage.jsx";
 import { OpportunityDetailsPage } from "../pages/opportunities/OpportunityDetailsPage.jsx";
+import { IndustryOpportunityApplicationsPage } from "../pages/industry/IndustryOpportunityApplicationsPage.jsx";
+import { IndustryApplicationDetailPage } from "../pages/industry/IndustryApplicationDetailPage.jsx";
 
 function StudentRoute({ children }) {
   return (
@@ -122,6 +127,30 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/app/opportunities/:id/apply"
+        element={
+          <StudentRoute>
+            <ApplyOpportunityPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/applications"
+        element={
+          <StudentRoute>
+            <StudentApplicationsPage />
+          </StudentRoute>
+        }
+      />
+      <Route
+        path="/app/applications/:id"
+        element={
+          <StudentRoute>
+            <StudentApplicationDetailPage />
+          </StudentRoute>
+        }
+      />
+      <Route
         path="/app/company-profile"
         element={
           <IndustryRoute>
@@ -150,6 +179,22 @@ export function AppRoutes() {
         element={
           <IndustryRoute>
             <OpportunityFormPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/opportunities/:id/applications"
+        element={
+          <IndustryRoute>
+            <IndustryOpportunityApplicationsPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/industry/applications/:id"
+        element={
+          <IndustryRoute>
+            <IndustryApplicationDetailPage />
           </IndustryRoute>
         }
       />

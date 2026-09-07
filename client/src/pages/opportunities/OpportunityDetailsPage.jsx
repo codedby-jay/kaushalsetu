@@ -14,6 +14,10 @@ import {
   getPublishedOpportunity,
 } from "../../services/api.js";
 import {
+  applicationStatusLabel,
+  applicationStatusVariant,
+} from "../../utils/application.js";
+import {
   compensationText,
   formatOpportunityDate,
   statusBadgeVariant,
@@ -137,10 +141,23 @@ export function OpportunityDetailsPage() {
             </div>
 
             {isIndustry && opportunity.status && opportunity.status !== "CLOSED" ? (
-              <div className="mt-4">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <Link to={`/app/opportunities/${opportunity.id}/edit`}>
                   <Button size="sm" variant="secondary">
                     Edit
+                  </Button>
+                </Link>
+                <Link to={`/app/opportunities/${opportunity.id}/applications`}>
+                  <Button size="sm">
+                    Applications ({opportunity.applicationCount ?? 0})
+                  </Button>
+                </Link>
+              </div>
+            ) : isIndustry ? (
+              <div className="mt-4">
+                <Link to={`/app/opportunities/${opportunity.id}/applications`}>
+                  <Button size="sm">
+                    Applications ({opportunity.applicationCount ?? 0})
                   </Button>
                 </Link>
               </div>
@@ -271,9 +288,35 @@ export function OpportunityDetailsPage() {
 
             {!isIndustry ? (
               <Card className="mt-4 p-5">
-                <p className="text-sm text-secondary">
-                  Application functionality coming soon.
-                </p>
+                {opportunity.myApplication ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-text">Applied</p>
+                      <p className="mt-1 text-sm text-secondary">
+                        Status: {applicationStatusLabel(opportunity.myApplication.status)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant={applicationStatusVariant(opportunity.myApplication.status)}>
+                        {applicationStatusLabel(opportunity.myApplication.status)}
+                      </Badge>
+                      <Link to={`/app/applications/${opportunity.myApplication.id}`}>
+                        <Button size="sm" variant="secondary">
+                          View application
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm text-secondary">
+                      Students can apply once. Cover letter is optional; resume upload is not included in this phase.
+                    </p>
+                    <Link to={`/app/opportunities/${opportunity.id}/apply`}>
+                      <Button>Apply Now</Button>
+                    </Link>
+                  </div>
+                )}
               </Card>
             ) : null}
           </>

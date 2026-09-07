@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { listForOpportunity } from "../controllers/industryApplicationController.js";
 import {
   closeMine,
   createMine,
@@ -16,6 +17,7 @@ const industryOnly = [authenticate, authorizeRoles("INDUSTRY")];
 
 industryOpportunityRoutes.get("/", ...industryOnly, listMine);
 industryOpportunityRoutes.post("/", ...industryOnly, createMine);
+industryOpportunityRoutes.get("/:id/applications", ...industryOnly, listForOpportunity);
 industryOpportunityRoutes.get("/:id", ...industryOnly, getMine);
 industryOpportunityRoutes.put("/:id", ...industryOnly, updateMine);
 industryOpportunityRoutes.delete("/:id", ...industryOnly, removeMine);

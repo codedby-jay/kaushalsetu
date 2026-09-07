@@ -222,3 +222,40 @@ export async function getCareerRoadmap() {
   const response = await api.get("/student/career-roadmap");
   return response.data;
 }
+
+export async function applyToOpportunity(id, data) {
+  const response = await api.post(`/opportunities/${id}/apply`, data);
+  return response.data;
+}
+
+export async function getStudentApplications(params = {}) {
+  const response = await api.get("/student/applications", { params });
+  return response.data;
+}
+
+export async function getStudentApplication(id) {
+  const response = await api.get(`/student/applications/${id}`);
+  return response.data;
+}
+
+export async function withdrawStudentApplication(id) {
+  const response = await api.patch(`/student/applications/${id}/withdraw`);
+  return response.data;
+}
+
+export async function getIndustryOpportunityApplications(opportunityId, params = {}) {
+  const response = await api.get(`/industry/opportunities/${opportunityId}/applications`, {
+    params,
+  });
+  return response.data;
+}
+
+export async function getIndustryApplication(id) {
+  const response = await api.get(`/industry/applications/${id}`);
+  return response.data;
+}
+
+export async function updateIndustryApplicationStatus(id, status) {
+  const response = await api.patch(`/industry/applications/${id}/status`, { status });
+  return response.data;
+}
