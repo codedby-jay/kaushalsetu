@@ -25,10 +25,13 @@ export function MatchScore({ match, className }) {
 
 export function SkillMatchRow({ item }) {
   const met = item.status === "MATCHED";
+  const partial = item.status === "PARTIAL";
+  const mark = met ? "✓" : partial ? "△" : "!";
+  const tone = met ? "text-success" : partial ? "text-warning" : "text-danger";
   return (
     <li className="flex items-start justify-between gap-3 text-sm">
-      <span className={met ? "text-success" : "text-warning"}>
-        {met ? "✓" : "!"} {item.skill}
+      <span className={tone}>
+        {mark} {item.skill}
       </span>
       <span className="shrink-0 text-secondary">
         {item.currentProficiency}/10 → required {item.requiredProficiency}/10

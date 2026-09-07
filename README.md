@@ -25,7 +25,7 @@ For each opportunity skill, student proficiency **S** is compared with required 
 
 The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
 
-## Current status (Phase 8)
+## Current status (Phase 9)
 
 Completed:
 
@@ -37,8 +37,9 @@ Completed:
 - Explainable skill matching (student → published opportunity) (Phase 6)
 - Career roles, skill roadmap, and dynamically recommended assessments (Phase 7)
 - Student applications, tracking, and industry application status (Phase 8)
+- Industry candidate ranking, filtering, and shortlist workflow (Phase 9)
 
-Not yet implemented: candidate ranking, analytics, academician portal, learning programmes, or portfolio.
+Not yet implemented: analytics, academician portal, learning programmes, or portfolio.
 
 ## MVP modules (planned)
 
@@ -51,8 +52,8 @@ Not yet implemented: candidate ranking, analytics, academician portal, learning 
 | Industry opportunities | 5 |
 | Matching engine | 6 |
 | Career roadmap + dynamic assessments | 7 |
-| Applications + tracking | 8 (this release) |
-| Industry candidate ranking | 9 |
+| Applications + tracking | 8 |
+| Industry candidate ranking | 9 (this release) |
 | Institution analytics | 10 |
 | Learning programmes | 10 (post-MVP) |
 | Digital portfolio | 11 |
@@ -184,8 +185,11 @@ Existing databases should apply Phase 5 with `npx prisma migrate deploy` (do not
 
 - `industry.abc@kaushalsetu.demo` / `KaushalSetu@2026` — ABC Technologies
 - `industry.nova@kaushalsetu.demo` / `KaushalSetu@2026` — Nova Software
+- `student.a@kaushalsetu.demo` / `KaushalSetu@2026` — Ananya Sharma
+- `student.b@kaushalsetu.demo` / `KaushalSetu@2026` — Karthik Iyer
+- `student.c@kaushalsetu.demo` / `KaushalSetu@2026` — Jay Prajapati
 
-Existing passwords for those emails are never overwritten.
+Seed also creates demo applications on ABC and Nova listings so industry candidate ranking can be reviewed without extra setup. Existing passwords for those emails are never overwritten.
 
 `npx prisma generate` does **not** require a live database, but it does need `DATABASE_URL` to be set.
 
@@ -246,13 +250,14 @@ App: `http://localhost:5173`
 | GET | `/api/student/applications` | Own applications |
 | GET | `/api/student/applications/:id` | Own application detail |
 | PATCH | `/api/student/applications/:id/withdraw` | Withdraw eligible application |
-| GET | `/api/industry/opportunities/:id/applications` | Applications for owned listing |
+| GET | `/api/industry/opportunities/:id/applications` | Ranked applicants for owned listing (`sort`, `status`, `search`, `minMatch`) |
 | GET | `/api/industry/applications/:id` | Owned application detail |
 | PATCH | `/api/industry/applications/:id/status` | Valid industry status transition |
 | UI | `/app/applications` | Student applications |
 | UI | `/app/applications/:id` | Student application detail |
 | UI | `/app/opportunities/:id/apply` | Apply form |
-| UI | `/app/opportunities/:id/applications` | Industry applicant list |
+| UI | `/app/candidates` | Industry candidate hub (owned opportunities) |
+| UI | `/app/opportunities/:id/applications` | Ranked industry applicant list |
 | UI | `/app/industry/applications/:id` | Industry application review |
 
 ## Development phases
@@ -266,8 +271,8 @@ Work proceeds **one phase at a time**. Do not start the next phase until it is e
 5. Industry opportunities  
 6. Matching engine  
 7. Career roadmap + dynamic assessments  
-8. Applications + tracking (this release)  
-9. Industry candidate ranking  
+8. Applications + tracking  
+9. Industry candidate ranking (this release)  
 10. Institution analytics  
 
 Post-MVP: learning programmes, digital portfolio, academician portal, verification, optional AI resume parsing, SIH polish.

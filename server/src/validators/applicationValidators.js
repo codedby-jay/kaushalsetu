@@ -1,5 +1,6 @@
 import { AppError } from "../utils/AppError.js";
 import { APPLICATION_STATUSES } from "../utils/application.js";
+import { RANKING_SORTS } from "../utils/ranking.js";
 
 const MAX_COVER_LETTER = 4000;
 const MAX_URL = 500;
@@ -82,6 +83,33 @@ export function parseApplicationFilters(query = {}) {
   if (query.search) {
     filters.search = String(query.search).trim();
   }
+
+  return filters;
+}
+
+export function parseIndustryCandidateFilters(query = {}) {
+  const filters = parseApplicationFilters(query);
+
+  const sortRaw = query.sort === undefined || query.sort === null || query.sort === ""
+    ? "match_desc"
+    : String(query.sort).trim();
+  if (!RANKING_SORTS.includes(sortRaw)) {
+    throw new AppError("Validation failed", 400, { sort: "Invalid sort option" });
+  }
+  filters.sort = sortRaw;
+
+  if (query.minMatch !== undefined && query.minMatch !== null && query.minMatch !== "") {
+    const minMatch = Number(query.minMatch);
+    if (!Number.isInteger(minMatch) || minMatch < 0 || minMatch > 100) {
+      throw new AppError("Validation failed", 400, {
+        minMatch: "minMatch must be an integer from 0 to 100",
+      });
+    }
+    filters.minMatch = minMatch;
+  }
+
+  const include = String(query.includeWithdrawn ?? "").trim().toLowerCase();
+  filters.includeWithdrawn = include === "true" || include === "1";
 
   return filters;
 }

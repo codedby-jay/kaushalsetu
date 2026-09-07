@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { APPLICATION_SEEDS } from "./applicationSeedData.js";
 import { ASSESSMENTS } from "./assessmentSeedData.js";
 import { FOCUSED_ASSESSMENTS } from "./careerAssessmentSeedData.js";
 import { CAREER_ROLES } from "./careerRoleSeedData.js";
@@ -288,6 +289,53 @@ async function seedDemoStudents() {
   }
 }
 
+async function seedDemoApplications() {
+  for (const entry of APPLICATION_SEEDS) {
+    const student = await prisma.user.findUnique({
+      where: { email: entry.studentEmail },
+      include: { profile: true },
+    });
+    const industry = await prisma.user.findUnique({
+      where: { email: entry.companyEmail },
+      include: { company: true },
+    });
+    if (!student?.profile || !industry?.company) {
+      throw new Error(`Missing seed identities for application ${entry.studentEmail} → ${entry.opportunityTitle}`);
+    }
+
+    const opportunity = await prisma.opportunity.findFirst({
+      where: {
+        companyProfileId: industry.company.id,
+        title: entry.opportunityTitle,
+      },
+    });
+    if (!opportunity) {
+      throw new Error(`Missing seed opportunity ${entry.opportunityTitle}`);
+    }
+
+    await prisma.application.upsert({
+      where: {
+        studentProfileId_opportunityId: {
+          studentProfileId: student.profile.id,
+          opportunityId: opportunity.id,
+        },
+      },
+      update: {
+        status: entry.status,
+        coverLetter: entry.coverLetter,
+        appliedAt: new Date(entry.appliedAt),
+      },
+      create: {
+        studentProfileId: student.profile.id,
+        opportunityId: opportunity.id,
+        status: entry.status,
+        coverLetter: entry.coverLetter,
+        appliedAt: new Date(entry.appliedAt),
+      },
+    });
+  }
+}
+
 async function main() {
   await seedSkills();
   await seedAssessmentList(ASSESSMENTS);
@@ -295,8 +343,9 @@ async function main() {
   await seedCareerRoles();
   await seedIndustryOpportunities();
   await seedDemoStudents();
+  await seedDemoApplications();
   console.log(
-    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length + FOCUSED_ASSESSMENTS.length} assessments, ${CAREER_ROLES.length} career roles, ${INDUSTRY_SEEDS.length} industry accounts, and ${STUDENT_SEEDS.length} demo students`,
+    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length + FOCUSED_ASSESSMENTS.length} assessments, ${CAREER_ROLES.length} career roles, ${INDUSTRY_SEEDS.length} industry accounts, ${STUDENT_SEEDS.length} demo students, and ${APPLICATION_SEEDS.length} demo applications`,
   );
 }
 
