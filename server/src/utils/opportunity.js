@@ -68,6 +68,7 @@ export function serializeOpportunity(record, { includeStatus = true } = {}) {
   if (includeStatus) {
     payload.status = record.status;
     payload.publishedAt = record.publishedAt;
+    payload.applicationCount = record._count?.applications ?? 0;
   }
 
   return payload;
@@ -78,5 +79,8 @@ export const opportunityInclude = {
   skills: {
     include: { skill: true },
     orderBy: { createdAt: "asc" },
+  },
+  _count: {
+    select: { applications: true },
   },
 };

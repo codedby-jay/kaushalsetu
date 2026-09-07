@@ -24,7 +24,7 @@ export async function getMatch(req, res, next) {
 
 export async function getPublished(req, res, next) {
   try {
-    const opportunity = await getPublishedOpportunity(req.params.id);
+    const opportunity = await getPublishedOpportunity(req.params.id, req.user.userId);
     res.status(200).json({ success: true, data: { opportunity } });
   } catch (error) {
     next(error);

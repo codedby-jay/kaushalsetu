@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { AppError } from "../utils/AppError.js";
+import { attachMyApplications } from "./applicationService.js";
 import { attachOpportunityMatches } from "./matchingService.js";
 import { opportunityInclude, serializeOpportunity } from "../utils/opportunity.js";
 import { parseBrowseFilters } from "../validators/opportunityValidators.js";
@@ -45,10 +46,11 @@ export async function listPublishedOpportunities(query, userId) {
     serializeOpportunity(item, { includeStatus: false }),
   );
 
-  return attachOpportunityMatches(userId, opportunities);
+  const withMatch = await attachOpportunityMatches(userId, opportunities);
+  return attachMyApplications(userId, withMatch);
 }
 
-export async function getPublishedOpportunity(opportunityId) {
+export async function getPublishedOpportunity(opportunityId, userId) {
   if (!opportunityId || typeof opportunityId !== "string") {
     throw new AppError("Opportunity not found", 404);
   }
@@ -65,5 +67,8 @@ export async function getPublishedOpportunity(opportunityId) {
     throw new AppError("Opportunity not found", 404);
   }
 
-  return serializeOpportunity(record, { includeStatus: false });
+  const [opportunity] = await attachMyApplications(userId, [
+    serializeOpportunity(record, { includeStatus: false }),
+  ]);
+  return opportunity;
 }

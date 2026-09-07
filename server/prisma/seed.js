@@ -4,6 +4,7 @@ import { ASSESSMENTS } from "./assessmentSeedData.js";
 import { FOCUSED_ASSESSMENTS } from "./careerAssessmentSeedData.js";
 import { CAREER_ROLES } from "./careerRoleSeedData.js";
 import { DEMO_INDUSTRY_PASSWORD, INDUSTRY_SEEDS } from "./opportunitySeedData.js";
+import { DEMO_STUDENT_PASSWORD, STUDENT_SEEDS } from "./studentSeedData.js";
 
 const prisma = new PrismaClient();
 
@@ -234,14 +235,68 @@ async function seedIndustryOpportunities() {
   }
 }
 
+async function seedDemoStudents() {
+  const skills = await prisma.skill.findMany();
+  const skillByName = new Map(skills.map((item) => [item.name, item]));
+  const passwordHash = await bcrypt.hash(DEMO_STUDENT_PASSWORD, 10);
+
+  for (const entry of STUDENT_SEEDS) {
+    let user = await prisma.user.findUnique({
+      where: { email: entry.email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: entry.name,
+          email: entry.email,
+          passwordHash,
+          role: "STUDENT",
+        },
+      });
+    }
+
+    const profile = await prisma.studentProfile.upsert({
+      where: { userId: user.id },
+      update: entry.profile,
+      create: {
+        userId: user.id,
+        ...entry.profile,
+      },
+    });
+
+    for (const skill of entry.skills) {
+      const catalog = skillByName.get(skill.name);
+      if (!catalog) {
+        throw new Error(`Unknown skill in student seed: ${skill.name}`);
+      }
+      await prisma.studentSkill.upsert({
+        where: {
+          studentProfileId_skillId: {
+            studentProfileId: profile.id,
+            skillId: catalog.id,
+          },
+        },
+        update: { proficiency: skill.proficiency },
+        create: {
+          studentProfileId: profile.id,
+          skillId: catalog.id,
+          proficiency: skill.proficiency,
+        },
+      });
+    }
+  }
+}
+
 async function main() {
   await seedSkills();
   await seedAssessmentList(ASSESSMENTS);
   await seedAssessmentList(FOCUSED_ASSESSMENTS);
   await seedCareerRoles();
   await seedIndustryOpportunities();
+  await seedDemoStudents();
   console.log(
-    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length + FOCUSED_ASSESSMENTS.length} assessments, ${CAREER_ROLES.length} career roles, and ${INDUSTRY_SEEDS.length} industry accounts`,
+    `Seeded ${SKILLS.length} skills, ${ASSESSMENTS.length + FOCUSED_ASSESSMENTS.length} assessments, ${CAREER_ROLES.length} career roles, ${INDUSTRY_SEEDS.length} industry accounts, and ${STUDENT_SEEDS.length} demo students`,
   );
 }
 

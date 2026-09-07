@@ -143,6 +143,7 @@ export function IndustryOpportunitiesPage() {
                   <th className="px-4 py-3 font-medium">Work mode</th>
                   <th className="px-4 py-3 font-medium">Created</th>
                   <th className="px-4 py-3 font-medium">Required skills</th>
+                  <th className="px-4 py-3 font-medium">Applications</th>
                   <th className="px-4 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
@@ -168,11 +169,17 @@ export function IndustryOpportunitiesPage() {
                         ))}
                       </div>
                     </td>
+                    <td className="px-4 py-3 text-secondary">{item.applicationCount ?? 0}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         <Link to={`/app/opportunities/${item.id}`}>
                           <Button size="sm" variant="secondary">
                             View
+                          </Button>
+                        </Link>
+                        <Link to={`/app/opportunities/${item.id}/applications`}>
+                          <Button size="sm" variant="secondary">
+                            Applications
                           </Button>
                         </Link>
                         {item.status !== "CLOSED" ? (

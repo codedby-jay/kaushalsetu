@@ -32,7 +32,7 @@ const NAV_BY_ROLE = {
     { id: "assessments", label: "Skill Assessment", icon: ClipboardCheck, to: "/app/assessments" },
     { id: "intelligence", label: "Skill Intelligence", icon: LineChart, to: "/app/skill-intelligence" },
     { id: "opportunities", label: "Opportunities", icon: Briefcase, to: "/app/opportunities" },
-    { id: "applications", label: "Applications", icon: ClipboardList },
+    { id: "applications", label: "Applications", icon: ClipboardList, to: "/app/applications" },
   ],
   INDUSTRY: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },

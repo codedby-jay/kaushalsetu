@@ -28,10 +28,12 @@ enum OpportunityType {
 
 enum ApplicationStatus {
   APPLIED
+  UNDER_REVIEW
   SHORTLISTED
   INTERVIEW
   SELECTED
   REJECTED
+  WITHDRAWN
 }
 
 enum AssessmentAttemptStatus {
@@ -90,6 +92,7 @@ model StudentProfile {
   skills             StudentSkill[]
   assessmentAttempts AssessmentAttempt[]
   careerGoal         StudentCareerGoal?
+  applications       Application[]
 }
 
 model Skill {
@@ -229,9 +232,27 @@ model Opportunity {
   updatedAt            DateTime           @updatedAt
   company              CompanyProfile     @relation(fields: [companyProfileId], references: [id], onDelete: Cascade)
   skills               OpportunitySkill[]
+  applications         Application[]
 
   @@index([companyProfileId, status])
   @@index([status, createdAt])
+}
+
+model Application {
+  id               String            @id @default(uuid())
+  studentProfileId String
+  opportunityId    String
+  status           ApplicationStatus @default(APPLIED)
+  coverLetter      String?
+  resumeUrl        String?
+  appliedAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  profile          StudentProfile    @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  opportunity      Opportunity       @relation(fields: [opportunityId], references: [id], onDelete: Restrict)
+
+  @@unique([studentProfileId, opportunityId])
+  @@index([opportunityId, status])
+  @@index([studentProfileId, appliedAt])
 }
 
 model OpportunitySkill {

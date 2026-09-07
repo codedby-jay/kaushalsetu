@@ -13,6 +13,7 @@ import {
   typeLabel,
   workModeLabel,
 } from "../../utils/opportunity.js";
+import { applicationStatusLabel } from "../../utils/application.js";
 
 const selectClass =
   "h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-text focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15";
@@ -236,6 +237,13 @@ export function StudentOpportunitiesPage() {
                   <Link to={`/app/opportunities/${item.id}`}>
                     <Button size="sm">View details</Button>
                   </Link>
+                  {item.myApplication ? (
+                    <Link to={`/app/applications/${item.myApplication.id}`}>
+                      <Button size="sm" variant="secondary">
+                        Applied · {applicationStatusLabel(item.myApplication.status)}
+                      </Button>
+                    </Link>
+                  ) : null}
                   {item.match?.available ? (
                     <Link to={`/app/opportunities/${item.id}#your-match`}>
                       <Button size="sm" variant="secondary">
