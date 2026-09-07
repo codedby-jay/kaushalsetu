@@ -259,3 +259,23 @@ export async function updateIndustryApplicationStatus(id, status) {
   const response = await api.patch(`/industry/applications/${id}/status`, { status });
   return response.data;
 }
+
+export async function getStudentDashboard() {
+  const response = await api.get("/student/dashboard");
+  return response.data;
+}
+
+export async function getIndustryDashboard() {
+  const response = await api.get("/industry/dashboard");
+  return response.data;
+}
+
+export async function getInstitutionDashboard() {
+  const response = await api.get("/institution/dashboard");
+  return response.data;
+}
+
+export async function getAcademicianDashboard() {
+  const response = await api.get("/academician/dashboard");
+  return response.data;
+}

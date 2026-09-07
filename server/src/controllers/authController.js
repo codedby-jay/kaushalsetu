@@ -2,11 +2,11 @@ import { getCurrentUser, loginUser, registerUser } from "../services/authService
 
 export async function register(req, res, next) {
   try {
-    const user = await registerUser(req.body);
+    const result = await registerUser(req.body);
     res.status(201).json({
       success: true,
       message: "Registration successful",
-      data: { user },
+      data: result,
     });
   } catch (error) {
     next(error);

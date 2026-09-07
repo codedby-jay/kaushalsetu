@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { fetchCurrentUser, loginRequest } from "../services/api.js";
+import { fetchCurrentUser, loginRequest, registerRequest } from "../services/api.js";
 import {
   clearAuthStorage,
   getStoredToken,
@@ -47,15 +47,22 @@ export function AuthProvider({ children }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = useCallback(async ({ email, password }) => {
-    const response = await loginRequest({ email, password });
-    const nextToken = response.data.token;
-    const nextUser = response.data.user;
+  const applySession = useCallback((nextToken, nextUser) => {
     persistAuth(nextToken, nextUser);
     setToken(nextToken);
     setUser(nextUser);
     return nextUser;
   }, []);
+
+  const login = useCallback(async ({ email, password }) => {
+    const response = await loginRequest({ email, password });
+    return applySession(response.data.token, response.data.user);
+  }, [applySession]);
+
+  const register = useCallback(async ({ name, email, password, role }) => {
+    const response = await registerRequest({ name, email, password, role });
+    return applySession(response.data.token, response.data.user);
+  }, [applySession]);
 
   const value = useMemo(
     () => ({
@@ -64,10 +71,11 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: Boolean(token && user),
       login,
+      register,
       logout,
       refreshUser,
     }),
-    [user, token, loading, login, logout, refreshUser],
+    [user, token, loading, login, register, logout, refreshUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

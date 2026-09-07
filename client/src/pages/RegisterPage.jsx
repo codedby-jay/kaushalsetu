@@ -6,7 +6,7 @@ import { Card } from "../components/ui/Card.jsx";
 import { Input } from "../components/ui/Input.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { PublicLayout } from "../layouts/PublicLayout.jsx";
-import { getApiErrorMessage, registerRequest } from "../services/api.js";
+import { getApiErrorMessage } from "../services/api.js";
 import { cn } from "../utils/cn.js";
 
 const roles = [
@@ -17,7 +17,7 @@ const roles = [
 ];
 
 export function RegisterPage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { register, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -49,8 +49,8 @@ export function RegisterPage() {
     setSubmitting(true);
 
     try {
-      await registerRequest({ name, email, password, role });
-      navigate("/login?registered=1", { replace: true });
+      await register({ name, email, password, role });
+      navigate("/app", { replace: true });
     } catch (err) {
       setError(getApiErrorMessage(err, "Registration failed"));
     } finally {

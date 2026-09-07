@@ -13,6 +13,12 @@ import { studentProfileRoutes } from "./studentProfileRoutes.js";
 import { studentSkillRoutes } from "./studentSkillRoutes.js";
 import { careerRoleRoutes } from "./careerRoleRoutes.js";
 import { studentCareerRoutes } from "./studentCareerRoutes.js";
+import {
+  academicianDashboardRoutes,
+  industryDashboardRoutes,
+  institutionDashboardRoutes,
+  studentDashboardRoutes,
+} from "./dashboardRoutes.js";
 
 const apiRouter = Router();
 
@@ -23,6 +29,10 @@ apiRouter.use("/student/skills", studentSkillRoutes);
 apiRouter.use("/student", studentAssessmentRoutes);
 apiRouter.use("/student", studentCareerRoutes);
 apiRouter.use("/student", studentApplicationRoutes);
+apiRouter.use("/student", studentDashboardRoutes);
+apiRouter.use("/industry", industryDashboardRoutes);
+apiRouter.use("/institution", institutionDashboardRoutes);
+apiRouter.use("/academician", academicianDashboardRoutes);
 apiRouter.use("/skills", skillCatalogRoutes);
 apiRouter.use("/assessments", assessmentRoutes);
 apiRouter.use("/career-roles", careerRoleRoutes);

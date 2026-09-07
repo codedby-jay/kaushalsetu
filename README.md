@@ -25,7 +25,7 @@ For each opportunity skill, student proficiency **S** is compared with required 
 
 The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
 
-## Current status (Phase 9)
+## Current status (Phase 10)
 
 Completed:
 
@@ -38,8 +38,32 @@ Completed:
 - Career roles, skill roadmap, and dynamically recommended assessments (Phase 7)
 - Student applications, tracking, and industry application status (Phase 8)
 - Industry candidate ranking, filtering, and shortlist workflow (Phase 9)
+- Role-specific dashboards, registration session, and platform-wide institution analytics (Phase 10)
 
-Not yet implemented: analytics, academician portal, learning programmes, or portfolio.
+Successful **registration now returns a JWT and public user** and the client stores that session, then opens `/app`. Passwords are never stored in the browser. Administrator accounts still cannot be created through public registration.
+
+### Dashboards
+
+`/app` is a role-specific workspace backed by live PostgreSQL data (no fake statistics).
+
+- **Student:** career-roadmap Industry Readiness (or “—” with no career goal), skills, applications, explainable matches, Skill Intelligence, and a profile-completion prompt.
+- **Industry:** company-scoped pipeline, opportunities, recent applications, and Phase 9 candidate ranking.
+- **Institution:** **platform-wide anonymized insights** (see below).
+- **Academician:** account + collaboration coming-soon + published industry activity snapshot (no fake KPIs).
+- **Admin:** lightweight placeholder. Institution analytics are **not** exposed to ADMIN.
+
+### Institution analytics (important limitation)
+
+There is **no** `InstitutionProfile` and **no** `StudentProfile.institutionId`. Phase 10 does **not** provide “your institution’s students.” INSTITUTION users see **platform-wide aggregated, anonymized** metrics. APIs do not return student names, emails, or profile IDs.
+
+Definitions:
+
+- **Industry Readiness / placement ready:** `calculateMatch()` against the student’s **career role** skills (same engine as the career roadmap). Bands: ≥80 Ready, ≥60 Almost Ready, ≥40 Developing, &lt;40 Needs Attention. Students without an active career goal are **Insufficient Data** and are excluded from the readiness average. Placement/opportunity ready means match ≥ 60%. A career goal with zero skills is 0% / Needs Attention.
+- **Skill gaps:** for students with a career goal, gap rate is the share whose `StudentSkill.proficiency` (missing = 0) is below that role’s `CareerRoleSkill.requiredProficiency`.
+- **Industry demand:** skills on **PUBLISHED** opportunities only (draft and closed are excluded).
+- **Gap vs demand:** deterministic rules (High/Medium/Low demand share vs average proficiency), not AI.
+
+Not yet implemented: learning programmes, digital portfolio, academician collaboration portal, or institution tenancy.
 
 ## MVP modules (planned)
 
@@ -53,8 +77,8 @@ Not yet implemented: analytics, academician portal, learning programmes, or port
 | Matching engine | 6 |
 | Career roadmap + dynamic assessments | 7 |
 | Applications + tracking | 8 |
-| Industry candidate ranking | 9 (this release) |
-| Institution analytics | 10 |
+| Industry candidate ranking | 9 |
+| Institution analytics + dashboards | 10 (this release) |
 | Learning programmes | 10 (post-MVP) |
 | Digital portfolio | 11 |
 | Academician portal | 12 |
@@ -217,7 +241,7 @@ App: `http://localhost:5173`
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/api/health` | Service + database status |
-| POST | `/api/auth/register` | Public registration (no ADMIN) |
+| POST | `/api/auth/register` | Public registration (no ADMIN); returns JWT + user |
 | POST | `/api/auth/login` | Returns JWT + user |
 | GET | `/api/auth/me` | Current user (Bearer token) |
 | GET | `/api/auth/student-only` | RBAC demo: STUDENT 200, others 403 |
@@ -237,10 +261,14 @@ App: `http://localhost:5173`
 | GET | `/api/student/assessments/history` | Own attempts |
 | GET | `/api/student/assessment-results/:attemptId` | Result + intelligence |
 | GET | `/api/student/skill-intelligence` | Latest per-skill intelligence |
+| GET | `/api/student/dashboard` | Student workspace (STUDENT) |
+| GET | `/api/industry/dashboard` | Company-scoped workspace (INDUSTRY) |
+| GET | `/api/institution/dashboard` | Platform-wide anonymized analytics (INSTITUTION) |
+| GET | `/api/academician/dashboard` | Lightweight academician workspace |
 | UI | `/` | Landing page |
 | UI | `/register` | Registration |
 | UI | `/login` | Sign in |
-| UI | `/app` | Protected application shell |
+| UI | `/app` | Role-specific dashboard |
 | UI | `/app/profile` | Student profile (STUDENT) |
 | UI | `/app/skills` | Student skills (STUDENT) |
 | UI | `/app/assessments` | Assessment list |
@@ -272,8 +300,8 @@ Work proceeds **one phase at a time**. Do not start the next phase until it is e
 6. Matching engine  
 7. Career roadmap + dynamic assessments  
 8. Applications + tracking  
-9. Industry candidate ranking (this release)  
-10. Institution analytics  
+9. Industry candidate ranking  
+10. Institution analytics + dashboards (this release)  
 
 Post-MVP: learning programmes, digital portfolio, academician portal, verification, optional AI resume parsing, SIH polish.
 

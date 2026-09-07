@@ -1,4 +1,4 @@
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Badge } from "../components/ui/Badge.jsx";
 import { Button } from "../components/ui/Button.jsx";
@@ -11,8 +11,6 @@ import { getApiErrorMessage } from "../services/api.js";
 export function LoginPage() {
   const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const registered = new URLSearchParams(location.search).get("registered") === "1";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,21 +47,12 @@ export function LoginPage() {
             the server, not selected here.
           </p>
 
-          {registered ? (
-            <p
-              className="mt-4 rounded-md border border-success/20 bg-success/10 px-3 py-2 text-sm text-success"
-              role="status"
-            >
-              Registration successful. Sign in to continue.
-            </p>
-          ) : null}
-
           <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
             <Input
               id="email"
               label="Email"
               type="email"
-              autoComplete="username"
+              autoComplete="email"
               placeholder="name@institution.edu"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
