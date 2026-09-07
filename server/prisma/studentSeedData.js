@@ -41,4 +41,26 @@ export const STUDENT_SEEDS = [
       { name: "Problem Solving", proficiency: 7 },
     ],
   },
+  {
+    email: "student.c@kaushalsetu.demo",
+    name: "Jay Prajapati",
+    profile: {
+      headline: "Web developer focused on internships",
+      bio: "Comfortable with React and Node.js, building toward industry-ready full-stack work.",
+      location: "Ahmedabad",
+      college: "State Institute of Technology",
+      degree: "B.Tech Computer Engineering",
+      graduationYear: 2027,
+    },
+    skills: [
+      { name: "React", proficiency: 7 },
+      { name: "JavaScript", proficiency: 7 },
+      { name: "Node.js", proficiency: 6 },
+      { name: "SQL", proficiency: 5 },
+      { name: "Git", proficiency: 5 },
+      { name: "HTML", proficiency: 6 },
+      { name: "CSS", proficiency: 6 },
+      { name: "Tailwind CSS", proficiency: 5 },
+    ],
+  },
 ];

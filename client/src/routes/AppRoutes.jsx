@@ -23,6 +23,7 @@ import { OpportunityFormPage } from "../pages/industry/OpportunityFormPage.jsx";
 import { OpportunityDetailsPage } from "../pages/opportunities/OpportunityDetailsPage.jsx";
 import { IndustryOpportunityApplicationsPage } from "../pages/industry/IndustryOpportunityApplicationsPage.jsx";
 import { IndustryApplicationDetailPage } from "../pages/industry/IndustryApplicationDetailPage.jsx";
+import { IndustryCandidatesPage } from "../pages/industry/IndustryCandidatesPage.jsx";
 
 function StudentRoute({ children }) {
   return (
@@ -179,6 +180,14 @@ export function AppRoutes() {
         element={
           <IndustryRoute>
             <OpportunityFormPage />
+          </IndustryRoute>
+        }
+      />
+      <Route
+        path="/app/candidates"
+        element={
+          <IndustryRoute>
+            <IndustryCandidatesPage />
           </IndustryRoute>
         }
       />

@@ -53,7 +53,7 @@ export function serializeApplicant(profile) {
   };
 }
 
-export function serializeApplication(record, { match = null, viewer = "student" } = {}) {
+export function serializeApplication(record, { match = null, viewer = "student", ranking = null } = {}) {
   const opportunity = record.opportunity
     ? serializeOpportunity(record.opportunity, {
         includeStatus: viewer === "industry",
@@ -74,6 +74,10 @@ export function serializeApplication(record, { match = null, viewer = "student" 
 
   if (viewer === "industry") {
     payload.applicant = serializeApplicant(record.profile);
+  }
+
+  if (ranking) {
+    payload.ranking = ranking;
   }
 
   return payload;

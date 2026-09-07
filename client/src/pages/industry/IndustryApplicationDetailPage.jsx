@@ -16,6 +16,7 @@ import {
   industryStatusActions,
 } from "../../utils/application.js";
 import { formatOpportunityDate } from "../../utils/opportunity.js";
+import { requiredSkillsLabel } from "../../utils/ranking.js";
 
 export function IndustryApplicationDetailPage() {
   const { id } = useParams();
@@ -60,6 +61,13 @@ export function IndustryApplicationDetailPage() {
   const actions = industryStatusActions(application?.status);
   const match = application?.match;
   const applicant = application?.applicant;
+  const ranking = application?.ranking;
+  const matchedSkills = match?.matchedSkills || match?.skills?.filter((item) => item.status === "MATCHED") || [];
+  const partialSkills = match?.partialSkills || match?.skills?.filter((item) => item.status === "PARTIAL") || [];
+  const gapSkills =
+    match?.skills?.filter((item) => item.status === "GAP") ||
+    match?.skillGaps?.filter((item) => item.status === "GAP") ||
+    [];
 
   return (
     <AppLayout>
@@ -69,7 +77,7 @@ export function IndustryApplicationDetailPage() {
             to={`/app/opportunities/${application.opportunity.id}/applications`}
             className="text-sm text-primary no-underline hover:underline"
           >
-            Back to applications
+            Back to ranked candidates
           </Link>
         ) : (
           <Link
@@ -119,7 +127,8 @@ export function IndustryApplicationDetailPage() {
                 <dl className="mt-3 grid gap-2 text-sm">
                   <Row label="Headline" value={applicant.headline || "—"} />
                   <Row label="College" value={applicant.college || "—"} />
-                  <Row label="Degree" value={applicant.degree || "—"} />
+                  <Row label="Education" value={applicant.education || applicant.degree || "—"} />
+                  <Row label="Graduation year" value={applicant.graduationYear || "—"} />
                   <Row label="Location" value={applicant.location || "—"} />
                 </dl>
               </Card>
@@ -127,21 +136,26 @@ export function IndustryApplicationDetailPage() {
 
             {match ? (
               <Card className="mt-4 p-5">
-                <h2 className="text-sm font-semibold text-text">Skill match</h2>
+                <h2 className="text-sm font-semibold text-text">Candidate fit</h2>
                 <p className="mt-1 text-xs text-secondary">
-                  Live Phase 6 formula using current student skills and this listing’s requirements.
+                  Live skill-based ranking using the Phase 6 match score. This is not an AI score.
                 </p>
                 <MatchScore match={{ available: true, ...match }} className="mt-2" />
+                {ranking ? (
+                  <p className="mt-3 text-sm text-text">
+                    Required skill coverage: {requiredSkillsLabel(ranking)}
+                    {ranking.requiredCount
+                      ? ` (${ranking.requiredSkillCoverage}%)`
+                      : ""}
+                  </p>
+                ) : null}
                 {match.summary ? (
                   <p className="mt-3 text-sm text-secondary">{match.summary}</p>
                 ) : null}
-                {match.skills?.length ? (
-                  <ul className="mt-3 grid gap-1">
-                    {match.skills.map((item) => (
-                      <SkillMatchRow key={item.skillId} item={item} />
-                    ))}
-                  </ul>
-                ) : null}
+
+                <SkillGroup title="Strong skills" items={matchedSkills} empty="No required skills are fully met yet." />
+                <SkillGroup title="Partial" items={partialSkills} empty="No partial skills." />
+                <SkillGroup title="Skill gaps" items={gapSkills} empty="No outstanding skill gaps." />
               </Card>
             ) : null}
 
@@ -189,6 +203,23 @@ export function IndustryApplicationDetailPage() {
         )}
       </div>
     </AppLayout>
+  );
+}
+
+function SkillGroup({ title, items, empty }) {
+  return (
+    <div className="mt-4">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-secondary">{title}</h3>
+      {items.length === 0 ? (
+        <p className="mt-1 text-sm text-secondary">{empty}</p>
+      ) : (
+        <ul className="mt-2 grid gap-1">
+          {items.map((item) => (
+            <SkillMatchRow key={item.skillId} item={item} />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

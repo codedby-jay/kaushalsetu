@@ -7,12 +7,18 @@ import { validateStatusPayload } from "../validators/applicationValidators.js";
 
 export async function listForOpportunity(req, res, next) {
   try {
-    const applications = await listIndustryOpportunityApplications(
+    const result = await listIndustryOpportunityApplications(
       req.user.userId,
       req.params.id,
       req.query,
     );
-    res.status(200).json({ success: true, data: { applications } });
+    res.status(200).json({
+      success: true,
+      data: {
+        applications: result.applications,
+        meta: result.meta,
+      },
+    });
   } catch (error) {
     next(error);
   }

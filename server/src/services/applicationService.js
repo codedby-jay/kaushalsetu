@@ -11,8 +11,13 @@ import {
 } from "../utils/application.js";
 import { calculateMatch, compactMatch } from "../utils/matching.js";
 import { serializeOpportunitySkill } from "../utils/opportunity.js";
+import { buildRankingMetadata, rankCandidates } from "../utils/ranking.js";
 import { requireCompanyProfile } from "./companyProfileService.js";
-import { parseApplicationFilters, validateApplyPayload } from "../validators/applicationValidators.js";
+import {
+  parseApplicationFilters,
+  parseIndustryCandidateFilters,
+  validateApplyPayload,
+} from "../validators/applicationValidators.js";
 
 async function requireStudentProfile(userId, message = "Create your student profile first") {
   const profile = await prisma.studentProfile.findUnique({
@@ -248,10 +253,12 @@ export async function listIndustryOpportunityApplications(userId, opportunityId,
     throw new AppError("Opportunity not found", 404);
   }
 
-  const filters = parseApplicationFilters(query);
+  const filters = parseIndustryCandidateFilters(query);
   const where = { opportunityId: opportunity.id };
   if (filters.status) {
     where.status = filters.status;
+  } else if (!filters.includeWithdrawn) {
+    where.status = { not: "WITHDRAWN" };
   }
   if (filters.search) {
     where.profile = {
@@ -270,20 +277,57 @@ export async function listIndustryOpportunityApplications(userId, opportunityId,
   });
 
   const requirements = opportunitySkillsForMatch(opportunity);
+  const scored = [];
 
-  return records.map((record) =>
-    serializeApplication(record, {
-      match: compactMatch(calculateMatch(record.profile?.skills || [], requirements)),
-      viewer: "industry",
-    }),
-  );
+  for (const record of records) {
+    const match = calculateMatch(record.profile?.skills || [], requirements);
+    if (filters.minMatch !== undefined && match.matchPercentage < filters.minMatch) {
+      continue;
+    }
+    const ranking = buildRankingMetadata(match);
+    scored.push({
+      id: record.id,
+      record,
+      match,
+      matchPercentage: match.matchPercentage,
+      requiredSkillCoverage: ranking.requiredSkillCoverage,
+      totalSkillGap: ranking.totalSkillGap,
+      appliedAt: record.appliedAt,
+      ranking,
+    });
+  }
+
+  const ranked = rankCandidates(scored, filters.sort);
+
+  return {
+    applications: ranked.map((item) =>
+      serializeApplication(item.record, {
+        match: compactMatch(item.match),
+        viewer: "industry",
+        ranking: {
+          rank: item.rank,
+          requiredSkillCoverage: item.ranking.requiredSkillCoverage,
+          coveredRequiredCount: item.ranking.coveredRequiredCount,
+          requiredCount: item.ranking.requiredCount,
+          totalSkillGap: item.ranking.totalSkillGap,
+        },
+      }),
+    ),
+    meta: {
+      sort: filters.sort,
+      minMatch: filters.minMatch ?? null,
+      includeWithdrawn: Boolean(filters.status) || filters.includeWithdrawn,
+    },
+  };
 }
 
 export async function getIndustryApplication(userId, applicationId) {
   const { record } = await getOwnedApplication(userId, applicationId);
+  const match = attachMatch(record.profile?.skills || [], record.opportunity, false);
   return serializeApplication(record, {
-    match: attachMatch(record.profile?.skills || [], record.opportunity, false),
+    match,
     viewer: "industry",
+    ranking: buildRankingMetadata(match),
   });
 }
 
@@ -307,8 +351,10 @@ export async function updateIndustryApplicationStatus(userId, applicationId, nex
     include: applicationInclude,
   });
 
+  const match = attachMatch(updated.profile?.skills || [], updated.opportunity, false);
   return serializeApplication(updated, {
-    match: attachMatch(updated.profile?.skills || [], updated.opportunity, false),
+    match,
     viewer: "industry",
+    ranking: buildRankingMetadata(match),
   });
 }

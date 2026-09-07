@@ -38,7 +38,7 @@ const NAV_BY_ROLE = {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
     { id: "company", label: "Company Profile", icon: Building2, to: "/app/company-profile" },
     { id: "opportunities", label: "My Opportunities", icon: Briefcase, to: "/app/opportunities/manage" },
-    { id: "candidates", label: "Candidates", icon: Users },
+    { id: "candidates", label: "Candidates", icon: Users, to: "/app/candidates" },
   ],
   ACADEMICIAN: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/app" },
