@@ -111,21 +111,35 @@ test("industry candidate ranking, filters, ownership, and empty states", async (
     .set(auth(industryAbc))
     .send({
       title: `Phase 9 Empty Intern ${suffix}`,
-      description: "No applicants and no required skills.",
+      description: "No applicants.",
       type: "INTERNSHIP",
       location: "Chennai",
       workMode: "REMOTE",
-      skills: [],
+      skills: [{ skillId: react.id, requiredProficiency: 5, isRequired: true }],
     });
   assert.equal(emptyOpp.status, 201, emptyOpp.body.message);
   const emptyOpportunityId = emptyOpp.body.data.opportunity.id;
 
+  const optionalOpp = await request(app)
+    .post("/api/industry/opportunities")
+    .set(auth(industryAbc))
+    .send({
+      title: `Phase 9 Optional Skills Intern ${suffix}`,
+      description: "Published listing with only optional skills.",
+      type: "INTERNSHIP",
+      location: "Chennai",
+      workMode: "REMOTE",
+      skills: [{ skillId: node.id, requiredProficiency: 5, isRequired: false }],
+    });
+  assert.equal(optionalOpp.status, 201, optionalOpp.body.message);
+  const optionalOpportunityId = optionalOpp.body.data.opportunity.id;
+
   t.after(async () => {
     await prisma.application.deleteMany({
-      where: { opportunityId: { in: [opportunityId, emptyOpportunityId] } },
+      where: { opportunityId: { in: [opportunityId, emptyOpportunityId, optionalOpportunityId] } },
     });
     await prisma.opportunity.deleteMany({
-      where: { id: { in: [opportunityId, emptyOpportunityId] } },
+      where: { id: { in: [opportunityId, emptyOpportunityId, optionalOpportunityId] } },
     });
   });
 
@@ -133,9 +147,10 @@ test("industry candidate ranking, filters, ownership, and empty states", async (
     .patch(`/api/industry/opportunities/${opportunityId}/publish`)
     .set(auth(industryAbc));
   assert.equal(published.status, 200, published.body.message);
-  await request(app)
-    .patch(`/api/industry/opportunities/${emptyOpportunityId}/publish`)
+  const publishedOptional = await request(app)
+    .patch(`/api/industry/opportunities/${optionalOpportunityId}/publish`)
     .set(auth(industryAbc));
+  assert.equal(publishedOptional.status, 200, publishedOptional.body.message);
 
   const apply = async (token, letter) => {
     const response = await request(app)
@@ -333,13 +348,13 @@ test("industry candidate ranking, filters, ownership, and empty states", async (
 
   await t.test("opportunity with no required skills does not crash", async () => {
     const applyEmpty = await request(app)
-      .post(`/api/opportunities/${emptyOpportunityId}/apply`)
+      .post(`/api/opportunities/${optionalOpportunityId}/apply`)
       .set(auth(outsider))
-      .send({ coverLetter: "No skills listed" });
+      .send({ coverLetter: "Optional skills only" });
     assert.equal(applyEmpty.status, 201, applyEmpty.body.message);
 
     const response = await request(app)
-      .get(`/api/industry/opportunities/${emptyOpportunityId}/applications`)
+      .get(`/api/industry/opportunities/${optionalOpportunityId}/applications`)
       .set(auth(industryAbc));
     assert.equal(response.status, 200);
     assert.equal(response.body.data.applications.length, 1);
