@@ -7,6 +7,18 @@ import { validateLogin, validateRegistration } from "../validators/authValidator
 
 const BCRYPT_ROUNDS = 10;
 
+export function issueSession(user) {
+  const token = signAccessToken({
+    userId: user.id,
+    role: user.role,
+  });
+
+  return {
+    token,
+    user: toPublicUser(user),
+  };
+}
+
 export async function registerUser(payload) {
   const input = validateRegistration(payload);
 
@@ -30,7 +42,7 @@ export async function registerUser(payload) {
       },
     });
 
-    return toPublicUser(user);
+    return issueSession(user);
   } catch (error) {
     if (error.code === "P2002") {
       throw new AppError("Email is already registered", 409);
@@ -55,15 +67,7 @@ export async function loginUser(payload) {
     throw new AppError("Invalid email or password", 401);
   }
 
-  const token = signAccessToken({
-    userId: user.id,
-    role: user.role,
-  });
-
-  return {
-    token,
-    user: toPublicUser(user),
-  };
+  return issueSession(user);
 }
 
 export async function getCurrentUser(userId) {
