@@ -1,310 +1,1142 @@
 # KaushalSetu
 
-Academia–Industry Collaboration Portal for Smart India Hackathon 2026.
+> **Bridging the gap between academic skills and industry requirements.**
 
-## Problem
+KaushalSetu is an **Academia–Industry Collaboration Portal** developed for **Smart India Hackathon 2026 — Problem Statement 26044**.
 
-There is a persistent gap between the skills students acquire in academic institutions and the competencies industries expect. Students often do not know which skills are in demand, which they are missing, which internships or jobs fit them, or which learning programmes to take. Industries struggle to find candidates with the right skills. Academicians need better access to faculty internships, industrial training, FDPs, consultancy, and research collaboration. Institutions need visibility into skill gaps, internship participation, placement readiness, and outcomes.
+The platform connects **students, industries, academicians, and institutions** through skill assessment, skill-gap analysis, career roadmaps, explainable opportunity matching, application tracking, candidate ranking, and institutional insights.
 
-## Solution
+---
 
-KaushalSetu is a central portal that connects **students**, **industries**, **academicians**, and **institutions**. Students build a skill profile through assessment, see gaps against industry requirements, receive learning recommendations, and apply to matched opportunities. Industries post internships and jobs with explicit skill requirements and review ranked candidates. Institutions see analytics on readiness and demand.
+## 📌 Problem Statement
 
-## Core USP
+### Smart India Hackathon 2026
 
-**Skill Intelligence + Opportunity Matching Engine**
+**Problem Statement ID:** 26044
 
-The MVP matching engine is an **explainable mathematical model**, not an LLM or embedding search.
+**Problem:** Portal for Academia–Industry Collaboration for Skill Mapping, Internships and Placement
 
-For each opportunity skill, student proficiency **S** is compared with required proficiency **R**. Required skills use weight **1.0**; optional skills use **0.5**.
+**Theme:** Smart Automation
 
-- If **R = 0**, the skill is fully satisfied (`scoreRatio = 1`)
-- Otherwise `scoreRatio = min(S / R, 1)` (missing student records use **S = 0**)
+**Category:** Software
 
-`matchPercentage = round( sum(scoreRatio × weight) / sum(weights) × 100 )`
+There is a persistent gap between the skills students develop in academic institutions and the competencies industries expect.
 
-The API returns match percentage, matched skills, partial skills, skill gaps, and a generated summary.
+### Students
 
-## Current status (Phase 10)
+- Difficulty identifying skills required for target roles.
+- Limited visibility into current skill proficiency.
+- Difficulty identifying personal skill gaps.
+- Difficulty finding opportunities that match their actual skills.
+- Lack of a clear path toward career readiness.
 
-Completed:
+### Industry
 
-- Foundation, design system, health API (Phase 1)
-- Authentication, JWT, RBAC (Phase 2)
-- Student profile and skills (Phase 3)
-- Skill assessments, scoring, Skill Intelligence, industry readiness (Phase 4)
-- Industry company profiles, opportunities, skill requirements, student browse/filter (Phase 5)
-- Explainable skill matching (student → published opportunity) (Phase 6)
-- Career roles, skill roadmap, and dynamically recommended assessments (Phase 7)
-- Student applications, tracking, and industry application status (Phase 8)
-- Industry candidate ranking, filtering, and shortlist workflow (Phase 9)
-- Role-specific dashboards, registration session, and platform-wide institution analytics (Phase 10)
+- Difficulty finding candidates with the required skills.
+- Time-consuming candidate screening and comparison.
+- Limited visibility into candidate skill gaps.
+- Need for skill-based candidate ranking.
 
-Successful **registration now returns a JWT and public user** and the client stores that session, then opens `/app`. Passwords are never stored in the browser. Administrator accounts still cannot be created through public registration.
+### Academicians
 
-### Dashboards
+- Need better access to industry collaboration opportunities.
+- Need access to industrial training, FDPs, consultancy, and research opportunities.
 
-`/app` is a role-specific workspace backed by live PostgreSQL data (no fake statistics).
+### Institutions
 
-- **Student:** career-roadmap Industry Readiness (or “—” with no career goal), skills, applications, explainable matches, Skill Intelligence, and a profile-completion prompt.
-- **Industry:** company-scoped pipeline, opportunities, recent applications, and Phase 9 candidate ranking.
-- **Institution:** **platform-wide anonymized insights** (see below).
-- **Academician:** account + collaboration coming-soon + published industry activity snapshot (no fake KPIs).
-- **Admin:** lightweight placeholder. Institution analytics are **not** exposed to ADMIN.
+- Need visibility into student skill readiness.
+- Need aggregate insight into common skill gaps.
+- Need visibility into industry skill demand.
+- Need better data for skill-development and placement planning.
 
-### Institution analytics (important limitation)
+---
 
-There is **no** `InstitutionProfile` and **no** `StudentProfile.institutionId`. Phase 10 does **not** provide “your institution’s students.” INSTITUTION users see **platform-wide aggregated, anonymized** metrics. APIs do not return student names, emails, or profile IDs.
+# 💡 Solution
 
-Definitions:
+KaushalSetu provides a single platform connecting the academic skill-development journey with the industry opportunity journey.
 
-- **Industry Readiness / placement ready:** `calculateMatch()` against the student’s **career role** skills (same engine as the career roadmap). Bands: ≥80 Ready, ≥60 Almost Ready, ≥40 Developing, &lt;40 Needs Attention. Students without an active career goal are **Insufficient Data** and are excluded from the readiness average. Placement/opportunity ready means match ≥ 60%. A career goal with zero skills is 0% / Needs Attention.
-- **Skill gaps:** for students with a career goal, gap rate is the share whose `StudentSkill.proficiency` (missing = 0) is below that role’s `CareerRoleSkill.requiredProficiency`.
-- **Industry demand:** skills on **PUBLISHED** opportunities only (draft and closed are excluded).
-- **Gap vs demand:** deterministic rules (High/Medium/Low demand share vs average proficiency), not AI.
+    Student Profile
+          ↓
+    Skill Assessment
+          ↓
+    Skill Intelligence
+          ↓
+    Skill Gap Analysis
+          ↓
+    Career Roadmap
+          ↓
+    Skill-Based Opportunity Matching
+          ↓
+    Application & Tracking
+          ↓
+    Industry Candidate Ranking
+          ↓
+    Institutional Insights
 
-Not yet implemented: learning programmes, digital portfolio, academician collaboration portal, or institution tenancy.
+The platform focuses on answering two important questions:
 
-## MVP modules (planned)
+> **What skills does the student currently have?**
 
-| Module | Phase |
-| --- | --- |
-| Foundation + UI design system | 1 |
-| Authentication + RBAC | 2 |
-| Student profile + skills | 3 |
-| Skill assessment + skill intelligence | 4 |
-| Industry opportunities | 5 |
-| Matching engine | 6 |
-| Career roadmap + dynamic assessments | 7 |
-| Applications + tracking | 8 |
-| Industry candidate ranking | 9 |
-| Institution analytics + dashboards | 10 (this release) |
-| Learning programmes | 10 (post-MVP) |
-| Digital portfolio | 11 |
-| Academician portal | 12 |
-| Verification | 13 |
-| Optional AI resume parsing | 14 |
-| SIH polish + deployment | 15 |
+and
 
-## Technology stack
+> **What does the student need to become ready for the desired career or opportunity?**
 
-| Layer | Choice |
-| --- | --- |
-| Frontend | React, JavaScript, Vite, React Router, Tailwind CSS, Axios, Lucide React |
-| Backend | Node.js, Express.js, JavaScript, REST |
-| Database | PostgreSQL, Prisma ORM 6.19.3 |
-| Auth | JWT (`jsonwebtoken`), bcryptjs |
+---
 
-Prisma is pinned to **6.19.3**. Prisma 7+ moved the database URL into a separate config file and requires a driver adapter. This project keeps `schema.prisma` + `DATABASE_URL`.
+# 🚀 Core USP
 
-JavaScript only. No TypeScript, MongoDB, Mongoose, NestJS, or microservices for this MVP.
+## Skill Intelligence + Explainable Opportunity Matching
 
-## Architecture
+KaushalSetu's core MVP differentiator is the combination of:
 
-```text
-React (Vite)
-    ↓ REST (Axios)
-Express
-    ↓ Controllers
-Services
-    ↓ Prisma
-PostgreSQL
-```
+    Skill Assessment
+           ↓
+    Skill Profile
+           ↓
+    Skill Gap Analysis
+           ↓
+    Career Readiness
+           ↓
+    Explainable Opportunity Matching
+           ↓
+    Application
+           ↓
+    Candidate Ranking
 
-```mermaid
-flowchart TD
-  Client["React client"] --> API["Express REST API"]
-  API --> C["Controllers"]
-  C --> S["Services"]
-  S --> P["Prisma"]
-  P --> DB["PostgreSQL"]
-```
+The current matching engine is a **deterministic mathematical model**.
 
-Business logic lives in services. Controllers stay thin. Routes do not contain domain rules.
+It does not depend on:
 
-## Project structure
+- LLMs
+- Embedding search
+- Vector databases
+- Black-box AI scoring
 
-```text
-.
-├── client/          React + Vite frontend
-├── server/          Express API + Prisma
-├── .env.example     Environment template
-├── README.md
-└── LICENSE
-```
+This makes the match score transparent and easy to explain.
 
-## Local setup
+---
 
-### 1. Clone the repository
+# 🧮 Explainable Matching Engine
 
-```bash
-git clone https://github.com/codedby-jay/kaushalsetu.git
-cd kaushalsetu
-```
+For every opportunity skill:
 
-### 2. Install dependencies
+- `S` = student's current proficiency
+- `R` = required proficiency
+- Required skill weight = `1.0`
+- Optional skill weight = `0.5`
+- Missing student skill = `S = 0`
 
-```bash
-cd server && npm install
-npx prisma generate
-cd ../client && npm install
-```
+### Skill Score
 
-### 3. Configure environment
+    if R = 0:
+        scoreRatio = 1
 
-Copy `.env.example` to `server/.env` and replace placeholders:
+    otherwise:
+        scoreRatio = min(S / R, 1)
 
-```bash
-cp .env.example server/.env
-```
+### Overall Match
 
-Do not commit `.env`. Set a long random `JWT_SECRET` before using login. Public registration cannot create `ADMIN` accounts.
+    matchPercentage =
+    round(
+        sum(scoreRatio × weight)
+        / sum(weights)
+        × 100
+    )
 
-Optional frontend override (`client/.env`):
-
-```bash
-VITE_API_URL=/api
-```
-
-In development, Vite proxies `/api` to `http://localhost:5000`.
-
-### 4. Start PostgreSQL
-
-Create a database named `kaushalsetu` (or match `DATABASE_URL`).
-
-Phase 1 **does not require** PostgreSQL for the API process to start. If the database is unreachable, `GET /api/health` still returns HTTP 200 with `"database": "down"`.
-
-### 5. Prisma (requires a running PostgreSQL instance)
-
-The repository includes a committed migration history:
-
-1. `init_user_foundation` — Phase 1 schema
-2. `add_authentication` — `User.name` and default role `STUDENT`
-3. `add_student_profile_and_skills` — Phase 3
-4. `add_skill_assessment_system` — Phase 4
-5. `add_industry_opportunities` — Phase 5
-
-If you already created a local `kaushalsetu` database during Phase 1 (no git migration history), treat it as disposable and recreate it:
-
-```bash
-dropdb kaushalsetu
-createdb kaushalsetu
-cd server
-npx prisma validate
-npx prisma migrate dev
-npx prisma generate
-npx prisma db seed
-```
-
-On Linux/macOS with `psql` instead of `dropdb`/`createdb`:
-
-```bash
-psql -d postgres -c "DROP DATABASE IF EXISTS kaushalsetu;"
-psql -d postgres -c "CREATE DATABASE kaushalsetu;"
-```
-
-Do **not** use `prisma db push`. Fresh clones should use `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (apply existing migrations only).
-
-Existing databases should apply Phase 5 with `npx prisma migrate deploy` (do not `migrate reset`). Seed is idempotent and creates demo industry accounts only when those emails are missing:
-
-- `industry.abc@kaushalsetu.demo` / `KaushalSetu@2026` — ABC Technologies
-- `industry.nova@kaushalsetu.demo` / `KaushalSetu@2026` — Nova Software
-- `student.a@kaushalsetu.demo` / `KaushalSetu@2026` — Ananya Sharma
-- `student.b@kaushalsetu.demo` / `KaushalSetu@2026` — Karthik Iyer
-- `student.c@kaushalsetu.demo` / `KaushalSetu@2026` — Jay Prajapati
-
-Seed also creates demo applications on ABC and Nova listings so industry candidate ranking can be reviewed without extra setup. Existing passwords for those emails are never overwritten.
-
-`npx prisma generate` does **not** require a live database, but it does need `DATABASE_URL` to be set.
-
-### 6. Start the backend
-
-```bash
-cd server
-npm run dev
-```
-
-API: `http://localhost:5000`  
-Health: `http://localhost:5000/api/health`
-
-### 7. Start the frontend
-
-```bash
-cd client
-npm run dev
-```
-
-App: `http://localhost:5173`
-
-## Routes
-
-| Method | Path | Notes |
-| --- | --- | --- |
-| GET | `/api/health` | Service + database status |
-| POST | `/api/auth/register` | Public registration (no ADMIN); returns JWT + user |
-| POST | `/api/auth/login` | Returns JWT + user |
-| GET | `/api/auth/me` | Current user (Bearer token) |
-| GET | `/api/auth/student-only` | RBAC demo: STUDENT 200, others 403 |
-| GET | `/api/student/profile` | Own student profile (STUDENT) |
-| POST | `/api/student/profile` | Create profile |
-| PUT | `/api/student/profile` | Update profile |
-| DELETE | `/api/student/profile` | Delete profile (not the User) |
-| GET | `/api/student/skills` | Own skills + summary |
-| POST | `/api/student/skills` | Add skill |
-| PUT | `/api/student/skills/:skillId` | Update proficiency |
-| DELETE | `/api/student/skills/:skillId` | Remove skill |
-| GET | `/api/skills` | Skill catalog (authenticated) |
-| GET | `/api/assessments` | Active assessments (STUDENT) |
-| GET | `/api/assessments/:id` | Questions without correct answers |
-| POST | `/api/assessments/:id/start` | Start or resume attempt |
-| POST | `/api/assessments/:id/submit` | Score and update skills |
-| GET | `/api/student/assessments/history` | Own attempts |
-| GET | `/api/student/assessment-results/:attemptId` | Result + intelligence |
-| GET | `/api/student/skill-intelligence` | Latest per-skill intelligence |
-| GET | `/api/student/dashboard` | Student workspace (STUDENT) |
-| GET | `/api/industry/dashboard` | Company-scoped workspace (INDUSTRY) |
-| GET | `/api/institution/dashboard` | Platform-wide anonymized analytics (INSTITUTION) |
-| GET | `/api/academician/dashboard` | Lightweight academician workspace |
-| UI | `/` | Landing page |
-| UI | `/register` | Registration |
-| UI | `/login` | Sign in |
-| UI | `/app` | Role-specific dashboard |
-| UI | `/app/profile` | Student profile (STUDENT) |
-| UI | `/app/skills` | Student skills (STUDENT) |
-| UI | `/app/assessments` | Assessment list |
-| UI | `/app/assessments/:id` | Take assessment |
-| UI | `/app/assessments/results/:attemptId` | Result |
-| POST | `/api/opportunities/:id/apply` | Student apply (STUDENT, published only) |
-| GET | `/api/student/applications` | Own applications |
-| GET | `/api/student/applications/:id` | Own application detail |
-| PATCH | `/api/student/applications/:id/withdraw` | Withdraw eligible application |
-| GET | `/api/industry/opportunities/:id/applications` | Ranked applicants for owned listing (`sort`, `status`, `search`, `minMatch`) |
-| GET | `/api/industry/applications/:id` | Owned application detail |
-| PATCH | `/api/industry/applications/:id/status` | Valid industry status transition |
-| UI | `/app/applications` | Student applications |
-| UI | `/app/applications/:id` | Student application detail |
-| UI | `/app/opportunities/:id/apply` | Apply form |
-| UI | `/app/candidates` | Industry candidate hub (owned opportunities) |
-| UI | `/app/opportunities/:id/applications` | Ranked industry applicant list |
-| UI | `/app/industry/applications/:id` | Industry application review |
-
-## Development phases
-
-Work proceeds **one phase at a time**. Do not start the next phase until it is explicitly requested.
-
-1. Foundation + UI design system  
-2. Authentication + RBAC  
-3. Student profile + skills  
-4. Skill assessment + skill intelligence  
-5. Industry opportunities  
-6. Matching engine  
-7. Career roadmap + dynamic assessments  
-8. Applications + tracking  
-9. Industry candidate ranking  
-10. Institution analytics + dashboards (this release)  
-
-Post-MVP: learning programmes, digital portfolio, academician portal, verification, optional AI resume parsing, SIH polish.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+### Example
+
+| Skill | Student Proficiency | Required | Result |
+|---|---:|---:|---|
+| React | 8 | 7 | Matched |
+| Node.js | 7 | 6 | Matched |
+| SQL | 6 | 6 | Matched |
+| DSA | 3 | 5 | Gap |
+
+### Result
+
+**90% Match**
+
+The system can explain:
+
+    Strong Skills:
+    ✓ React
+    ✓ Node.js
+    ✓ SQL
+
+    Skill Gap:
+    ⚠ DSA
+
+    Required: 5
+    Current: 3
+    Gap: +2 proficiency
+
+This allows both students and recruiters to understand **why** a candidate matches an opportunity.
+
+---
+
+# ✨ Key Features
+
+## 👨‍🎓 Student
+
+### Student Profile
+
+Students can manage:
+
+- Personal information
+- Education
+- College
+- Degree
+- Graduation year
+- Location
+- Professional links
+- Technical skills
+- Soft skills
+- Skill proficiency from 0–10
+
+### Skill Assessment
+
+Students can:
+
+- Browse active assessments.
+- Start an assessment.
+- Answer skill-based questions.
+- Submit an assessment.
+- View results.
+- View assessment history.
+- Receive per-skill proficiency updates.
+
+### Skill Intelligence
+
+Students can identify:
+
+- Strengths
+- Developing skills
+- Skill gaps
+- Current proficiency
+- Assessment performance
+- Recommended areas of focus
+
+### Career Roadmap
+
+Students can select career goals such as:
+
+- Java Developer
+- Python Developer
+- Frontend Developer
+- Backend Developer
+- Full Stack Developer
+- Data Analyst
+- DevOps Engineer
+- Software Engineer
+
+The roadmap provides:
+
+- Career readiness
+- Required skills
+- Current proficiency
+- Skill gaps
+- Recommended assessments
+- Next skills to focus on
+
+### Opportunities
+
+Students can:
+
+- Browse internships.
+- Browse jobs.
+- Browse apprenticeships.
+- Search opportunities.
+- Filter by type.
+- Filter by location.
+- Filter by work mode.
+- View skill requirements.
+- View explainable match scores.
+
+### Applications
+
+Students can:
+
+- Apply to opportunities.
+- Add a cover letter.
+- Track applications.
+- View application details.
+- Withdraw eligible applications.
+
+---
+
+# 🏢 Industry
+
+Industry users can:
+
+## Company Profile
+
+- Create company profile.
+- Add company information.
+- Add industry.
+- Add location.
+- Add company size.
+- Add website.
+
+## Opportunity Management
+
+Industry users can:
+
+- Create opportunities.
+- Edit opportunities.
+- Define required skills.
+- Define required proficiency.
+- Define optional skills.
+- Publish opportunities.
+- Close opportunities.
+
+Supported opportunity types include:
+
+- Internships
+- Jobs
+- Apprenticeships
+
+## Candidate Management
+
+Industry users can:
+
+- View applications.
+- View candidate profiles.
+- View skill match.
+- View skill gaps.
+- Rank candidates.
+- Search candidates.
+- Filter candidates.
+- Filter by minimum match.
+- Filter by application status.
+- Shortlist candidates.
+- Update application status.
+
+---
+
+# 🏛 Institution
+
+The current MVP provides **platform-wide anonymized institutional analytics**.
+
+Institutions can view:
+
+- Student skill readiness
+- Readiness distribution
+- Common skill gaps
+- Industry skill demand
+- Gap-vs-demand insights
+- Application pipeline insights
+
+## Important Limitation
+
+The current MVP does **not** contain:
+
+    InstitutionProfile
+
+or:
+
+    StudentProfile.institutionId
+
+Therefore the current institution dashboard is:
+
+> **Platform-wide and anonymized**
+
+It is **not institution-specific**.
+
+Institution APIs do not expose:
+
+- Student names
+- Student emails
+- Student profile IDs
+
+---
+
+# 👨‍🏫 Academician
+
+The current MVP provides a lightweight academician workspace containing:
+
+- Account information
+- Collaboration coming-soon area
+- Published industry activity snapshot
+
+The complete academician collaboration workflow is planned for a future phase.
+
+---
+
+# 📊 Dashboards
+
+## Student Dashboard
+
+Provides:
+
+- Career readiness
+- Skill count
+- Applications
+- Career goal
+- Skill Intelligence
+- Recommended opportunities
+- Recent applications
+- Profile completion
+
+## Industry Dashboard
+
+Provides company-scoped:
+
+- Open opportunities
+- Application pipeline
+- Recent applications
+- Candidate ranking
+- Shortlisted candidates
+- Selected candidates
+
+## Institution Dashboard
+
+Provides:
+
+- Total students
+- Assessed students
+- Readiness distribution
+- Skill-gap trends
+- Industry skill demand
+- Gap-vs-demand insights
+- Application pipeline
+
+## Academician Workspace
+
+Provides:
+
+- Account information
+- Collaboration coming-soon section
+- Published industry activity snapshot
+
+---
+
+# 🔐 Authentication & Security
+
+KaushalSetu uses:
+
+- JWT authentication
+- bcryptjs password hashing
+- Role-Based Access Control
+- Protected routes
+- Ownership checks
+- Environment-based secrets
+
+### Roles
+
+    STUDENT
+    INDUSTRY
+    ACADEMICIAN
+    INSTITUTION
+    ADMIN
+
+### Security Principles
+
+- Password hashes are never returned through APIs.
+- Passwords are not stored in browser local storage.
+- JWT secrets are stored in environment variables.
+- Public registration cannot create ADMIN accounts.
+- Users can only access authorized modules.
+- Industry users can only access their own company resources.
+- Students can only access their own applications.
+- Institution analytics are anonymized.
+
+---
+
+# 🔄 Application Workflow
+
+    APPLIED
+       ↓
+    UNDER_REVIEW
+       ↓
+    SHORTLISTED
+       ↓
+    INTERVIEW
+       ↓
+    SELECTED
+
+The system also supports valid rejection and student withdrawal flows.
+
+---
+
+# 🏆 Candidate Ranking
+
+Industry candidates are ranked using the same matching engine used for student opportunity matching.
+
+### Default Ranking Priority
+
+1. Match percentage
+2. Required-skill coverage
+3. Total skill gap
+4. Earlier application time
+5. Application ID as deterministic tie-breaker
+
+### Candidate Filters
+
+- Search
+- Application status
+- Minimum match percentage
+- Withdrawn applications
+
+### Candidate Sorting
+
+- Match — highest first
+- Match — lowest first
+- Application — newest first
+- Application — oldest first
+
+---
+
+# 📈 Industry Readiness
+
+Career readiness is calculated by comparing a student's skills with the skills required by their selected career role.
+
+### Readiness Bands
+
+| Match Score | Readiness |
+|---:|---|
+| ≥ 80% | Ready |
+| ≥ 60% | Almost Ready |
+| ≥ 40% | Developing |
+| < 40% | Needs Attention |
+
+Students without an active career goal are classified as:
+
+**Insufficient Data**
+
+and are excluded from the readiness average.
+
+---
+
+# 🏗 Architecture
+
+KaushalSetu follows a **modular monolith architecture**.
+
+    ┌─────────────────────────────┐
+    │      React + Vite Client    │
+    │ Tailwind + React Router     │
+    └──────────────┬──────────────┘
+                   │
+                REST API
+                   │
+    ┌──────────────▼──────────────┐
+    │        Express.js           │
+    │            API              │
+    └──────────────┬──────────────┘
+                   │
+              Controllers
+                   │
+                   ▼
+                Services
+                   │
+                   ▼
+                 Prisma
+                   │
+                   ▼
+              PostgreSQL
+
+### Architecture Principles
+
+- Business logic lives in services.
+- Controllers remain thin.
+- Routes do not contain domain rules.
+- Prisma handles database access.
+- JWT provides authentication context.
+- Ownership is derived from the authenticated user.
+- Matching is calculated from current skill data.
+- Microservices are intentionally not used for the MVP.
+
+---
+
+# 🛠 Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React |
+| Language | JavaScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS |
+| Routing | React Router |
+| HTTP Client | Axios |
+| Icons | Lucide React |
+| Backend | Node.js |
+| Framework | Express.js |
+| API | REST |
+| Database | PostgreSQL |
+| ORM | Prisma 6.19.3 |
+| Authentication | JWT |
+| Password Hashing | bcryptjs |
+
+### Technology Decision
+
+The MVP intentionally uses:
+
+- React
+- JavaScript
+- Node.js
+- Express.js
+- PostgreSQL
+- Prisma
+- JWT
+- bcryptjs
+
+The MVP does not use:
+
+- TypeScript
+- MongoDB
+- Mongoose
+- NestJS
+- Microservices
+- LLM-based core matching
+- Vector database
+
+---
+
+# 📁 Project Structure
+
+    kaushalsetu/
+    │
+    ├── client/
+    │   ├── src/
+    │   │   ├── components/
+    │   │   ├── context/
+    │   │   ├── pages/
+    │   │   ├── services/
+    │   │   ├── App.jsx
+    │   │   └── main.jsx
+    │   │
+    │   ├── index.html
+    │   ├── package.json
+    │   └── vite.config.js
+    │
+    ├── server/
+    │   ├── prisma/
+    │   │   ├── migrations/
+    │   │   ├── schema.prisma
+    │   │   └── seed.js
+    │   │
+    │   ├── src/
+    │   │   ├── controllers/
+    │   │   ├── middleware/
+    │   │   ├── routes/
+    │   │   ├── services/
+    │   │   ├── utils/
+    │   │   ├── validators/
+    │   │   └── server.js
+    │   │
+    │   ├── tests/
+    │   └── package.json
+    │
+    ├── .env.example
+    ├── .gitignore
+    ├── LICENSE
+    └── README.md
+
+---
+
+# 🗄 Database Overview
+
+The main domain relationships are:
+
+    User
+     ├── StudentProfile
+     │     ├── StudentSkill ── Skill
+     │     ├── AssessmentAttempt
+     │     ├── StudentCareerGoal ── CareerRole
+     │     └── Application ── Opportunity
+     │
+     └── CompanyProfile
+           └── Opportunity
+                 └── OpportunitySkill ── Skill
+
+    Assessment
+     └── AssessmentQuestion ── Skill
+           └── AssessmentAttempt
+                 ├── AssessmentAnswer
+                 └── SkillAssessmentResult
+
+### Important Database Decisions
+
+- `StudentSkill.proficiency` is the current proficiency source of truth.
+- Assessment results are retained as intelligence/audit records.
+- Opportunity requirements use `OpportunitySkill`.
+- Career requirements use `CareerRoleSkill`.
+- Student + opportunity applications are unique.
+- Ownership is enforced through authenticated users.
+
+---
+
+# 🔌 API Overview
+
+## Authentication
+
+    POST /api/auth/register
+    POST /api/auth/login
+    GET  /api/auth/me
+
+## Student Profile
+
+    GET    /api/student/profile
+    POST   /api/student/profile
+    PUT    /api/student/profile
+    DELETE /api/student/profile
+
+## Student Skills
+
+    GET    /api/student/skills
+    POST   /api/student/skills
+    PUT    /api/student/skills/:skillId
+    DELETE /api/student/skills/:skillId
+
+    GET    /api/skills
+
+## Assessments
+
+    GET  /api/assessments
+    GET  /api/assessments/:id
+    POST /api/assessments/:id/start
+    POST /api/assessments/:id/submit
+
+    GET /api/student/assessments/history
+    GET /api/student/assessment-results/:attemptId
+    GET /api/student/skill-intelligence
+
+## Career Roadmap
+
+    GET /api/career-roles
+    GET /api/career-roles/:id
+
+    GET /api/student/career-goal
+    PUT /api/student/career-goal
+
+    GET /api/student/career-roadmap
+
+## Opportunities
+
+    GET /api/opportunities
+    GET /api/opportunities/:id
+    GET /api/opportunities/:id/match
+
+Industry users also have company-profile and own-opportunity CRUD/lifecycle endpoints.
+
+## Applications
+
+    POST  /api/opportunities/:id/apply
+
+    GET   /api/student/applications
+    GET   /api/student/applications/:id
+    PATCH /api/student/applications/:id/withdraw
+
+    GET   /api/industry/opportunities/:id/applications
+    GET   /api/industry/applications/:id
+    PATCH /api/industry/applications/:id/status
+
+## Dashboards
+
+    GET /api/student/dashboard
+    GET /api/industry/dashboard
+    GET /api/institution/dashboard
+    GET /api/academician/dashboard
+
+---
+
+# 🧪 Testing
+
+The project is developed phase-by-phase with:
+
+- API testing
+- Unit testing
+- Client build verification
+- Browser verification
+- Authorization testing
+- Ownership testing
+
+### Matching Tests Cover
+
+- Full match
+- Partial match
+- Missing skills
+- Required skills
+- Optional skills
+- Zero required proficiency
+- Multiple skills
+- Match-band boundaries
+- Skill-gap explanations
+
+### Application Tests Cover
+
+- Authentication
+- Authorization
+- Resource ownership
+- Application creation
+- Application uniqueness
+- Status transitions
+- Published/closed opportunity rules
+
+### Candidate Ranking Tests Cover
+
+- Match ranking
+- Required-skill coverage
+- Skill gaps
+- Search
+- Status filters
+- Minimum match filters
+- Sorting
+- Ownership
+
+---
+
+# 📋 Current Implementation Status
+
+| Phase | Feature | Status |
+|---:|---|:---:|
+| 1 | Foundation + UI Design System | ✅ |
+| 2 | Authentication + RBAC | ✅ |
+| 3 | Student Profile + Skills | ✅ |
+| 4 | Skill Assessment + Skill Intelligence | ✅ |
+| 5 | Industry Opportunities | ✅ |
+| 6 | Explainable Matching Engine | ✅ |
+| 7 | Career Roadmap + Dynamic Assessments | ✅ |
+| 8 | Applications + Tracking | ✅ |
+| 9 | Industry Candidate Ranking | ✅ |
+| 10 | Dashboards + Institution Analytics | ✅ |
+
+---
+
+# 🗺 Post-MVP Roadmap
+
+The following features are **planned and are not presented as current MVP functionality**.
+
+## Phase 11 — Digital Skill Portfolio
+
+Planned:
+
+- Projects
+- Certifications
+- Experience
+- Structured digital portfolio
+
+## Phase 12 — Academician Portal
+
+Planned:
+
+- Faculty internships
+- Industrial training
+- FDP opportunities
+- Consultancy
+- Research collaboration
+
+## Phase 13 — Verification
+
+Planned:
+
+- Organization verification
+- Document verification
+- Trusted credentials
+
+## Phase 14 — Optional AI Features
+
+Potential future features:
+
+- Resume parsing
+- Skill extraction
+- Semantic skill normalization
+- AI-assisted recommendations
+
+The core matching engine will remain explainable.
+
+## Phase 15 — Production Deployment
+
+Planned:
+
+- Production deployment
+- Monitoring
+- Performance optimization
+- Security hardening
+- Institutional tenancy
+- Domain-specific skill taxonomies
+- Ayush-specific skill mapping
+
+---
+
+# ⚙️ Local Setup
+
+## Prerequisites
+
+Install:
+
+- Node.js
+- npm
+- PostgreSQL
+- Git
+
+## 1. Clone Repository
+
+    git clone https://github.com/codedby-jay/kaushalsetu.git
+    cd kaushalsetu
+
+## 2. Install Backend
+
+    cd server
+    npm install
+    npx prisma generate
+
+## 3. Install Frontend
+
+    cd ../client
+    npm install
+
+## 4. Configure Environment Variables
+
+Create:
+
+    server/.env
+
+Example:
+
+    DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/kaushalsetu?schema=public"
+    JWT_SECRET="YOUR_LONG_RANDOM_SECRET"
+    PORT=5000
+
+Never commit `.env`.
+
+## 5. Create PostgreSQL Database
+
+Create a PostgreSQL database named:
+
+    kaushalsetu
+
+For an existing database with committed migrations:
+
+    cd server
+    npx prisma migrate deploy
+    npx prisma generate
+    npx prisma db seed
+
+For a fresh local development database:
+
+    npx prisma migrate dev
+    npx prisma generate
+    npx prisma db seed
+
+Do not use:
+
+    npx prisma db push
+
+for the project's normal migration workflow.
+
+## 6. Start Backend
+
+    cd server
+    npm run dev
+
+Backend:
+
+    http://localhost:5000
+
+Health endpoint:
+
+    http://localhost:5000/api/health
+
+## 7. Start Frontend
+
+Open another terminal:
+
+    cd client
+    npm run dev
+
+Frontend:
+
+    http://localhost:5173
+
+---
+
+# 👤 Demo Accounts
+
+The seed provides demo accounts for local testing.
+
+| Role | Email | Password |
+|---|---|---|
+| Industry | `industry.abc@kaushalsetu.demo` | `KaushalSetu@2026` |
+| Industry | `industry.nova@kaushalsetu.demo` | `KaushalSetu@2026` |
+| Student | `student.a@kaushalsetu.demo` | `KaushalSetu@2026` |
+| Student | `student.b@kaushalsetu.demo` | `KaushalSetu@2026` |
+| Student | `student.c@kaushalsetu.demo` | `KaushalSetu@2026` |
+
+These credentials are intended for **local/demo use only**.
+
+---
+
+# 🎬 Recommended Demo Flow
+
+## Student Demo
+
+    Login
+      ↓
+    Complete Profile
+      ↓
+    Add Skills
+      ↓
+    Select Career Goal
+      ↓
+    Take Assessment
+      ↓
+    View Skill Intelligence
+      ↓
+    View Career Roadmap
+      ↓
+    Browse Opportunities
+      ↓
+    View Explainable Match
+      ↓
+    Apply
+      ↓
+    Track Application
+
+## Industry Demo
+
+    Login
+      ↓
+    Company Profile
+      ↓
+    Publish Opportunity
+      ↓
+    View Applications
+      ↓
+    Candidate Ranking
+      ↓
+    Open Candidate
+      ↓
+    View Match + Skill Gaps
+      ↓
+    Update Application Status
+
+## Institution Demo
+
+    Login
+      ↓
+    Institution Dashboard
+      ↓
+    Readiness Distribution
+      ↓
+    Skill Gap Insights
+      ↓
+    Industry Demand
+      ↓
+    Application Insights
+
+---
+
+# 🎯 Why KaushalSetu?
+
+Existing platforms can provide professional profiles, job discovery, internships, candidate search, or recruitment workflows.
+
+KaushalSetu focuses on connecting **academic skill development with industry requirements**.
+
+### Traditional Workflow
+
+    Profile
+       ↓
+    Search
+       ↓
+    Apply
+
+### KaushalSetu Workflow
+
+    Skills
+      ↓
+    Assessment
+      ↓
+    Skill Gap
+      ↓
+    Career Roadmap
+      ↓
+    Explainable Match
+      ↓
+    Opportunity
+      ↓
+    Application
+      ↓
+    Candidate Ranking
+      ↓
+    Institutional Insights
+
+### Core Differentiator
+
+> **Not just finding an opportunity — identifying what the learner needs to become ready for it.**
+
+---
+
+# 📚 Research & References
+
+### World Economic Forum
+
+**Future of Jobs Report 2025**
+
+https://www.weforum.org/publications/the-future-of-jobs-report-2025/
+
+### Government of India
+
+**National Education Policy 2020**
+
+https://www.education.gov.in/nep/nep2020_final_eng.pdf
+
+### AICTE
+
+**National Internship Portal**
+
+https://internship.aicte-india.org/
+
+### LinkedIn
+
+**Recruiter Skills Match**
+
+https://www.linkedin.com/help/recruiter/answer/a596630
+
+### IEEE
+
+**Explainable Job-Posting Recommendations**
+
+https://ieeexplore.ieee.org/document/9658757/
+
+### Ministry of Ayush
+
+**AYURGYAN — Research & Innovation**
+
+https://ngo.ayush.gov.in/central-sector-scheme-ayurgyan
+
+---
+
+# 🇮🇳 Smart India Hackathon 2026
+
+| Field | Details |
+|---|---|
+| Event | Smart India Hackathon 2026 |
+| Problem Statement ID | 26044 |
+| Problem | Portal for Academia–Industry Collaboration for Skill Mapping, Internships and Placement |
+| Theme | Smart Automation |
+| Category | Software |
+| Team | KaushalSetu |
+
+---
+
+# 🔗 Repository
+
+GitHub:
+
+https://github.com/codedby-jay/kaushalsetu
+
+---
+
+# 📄 License
+
+This project is licensed under the **MIT License**.
+
+See [`LICENSE`](LICENSE) for details.
+
+---
+
+# 👥 Team
+
+**KaushalSetu**
+
+> Bridging the gap between academic skills and industry requirements.
